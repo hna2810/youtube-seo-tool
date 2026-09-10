@@ -1,0 +1,29 @@
+{
+  "name": "youtube-seo-tool",
+  "version": "1.0.0",
+  "description": "Công cụ viết bài chuẩn SEO từ Video YouTube bằng Node.js và LLM",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "seo",
+    "youtube",
+    "llm",
+    "gemini",
+    "content-writer",
+    "aeo"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "docx": "^9.5.3",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "marked": "^18.0.12",
+    "yaml": "^2.7.0",
+    "youtube-transcript": "^1.3.0"
+  }
+}

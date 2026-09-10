@@ -1,0 +1,49 @@
+{
+  "banned_words": [
+    "tốt nhất",
+    "số 1",
+    "duy nhất",
+    "100% hiệu quả",
+    "tuyệt đối",
+    "khỏi",
+    "chữa bệnh",
+    "cam kết",
+    "dứt điểm",
+    "khỏi hoàn toàn",
+    "hoàn toàn",
+    "đảm bảo",
+    "không bao giờ tái phát",
+    "an toàn tuyệt đối",
+    "chữa khỏi",
+    "trị",
+    "điều trị",
+    "chữa trị",
+    "điều trị dứt điểm",
+    "trị tận gốc",
+    "thuốc",
+    "kê đơn",
+    "chẩn đoán",
+    "trắng da sau 1 đêm",
+    "rẻ nhất thị trường",
+    "hệ thống cửa hàng",
+    "thành phần lành tính",
+    "sản phẩm lành tính",
+    "khỏi hăm tã chỉ sau 3, 5, 7 ngày",
+    "chuẩn y khoa",
+    "ai seo",
+    "chuẩn ai seo",
+    "geo",
+    "aeo"
+  ],
+  "restricted_words": [
+    {
+      "word": "thiên nhiên",
+      "replacement": "tự nhiên",
+      "reason": "Quy định chuẩn hóa từ vựng: dùng 'tự nhiên' thay vì 'thiên nhiên'"
+    },
+    {
+      "word": "nên",
+      "warning": "Hạn chế lạm dụng từ 'nên' quá nhiều lần trong bài viết"
+    }
+  ]
+}

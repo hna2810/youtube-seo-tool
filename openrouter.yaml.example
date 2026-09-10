@@ -1,0 +1,3 @@
+# Đổi tên file này thành openrouter.yaml và dán API Key của bạn vào
+api_key: "sk-or-v1-your-openrouter-key-here"
+model: "google/gemini-2.5-flash"

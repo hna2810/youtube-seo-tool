@@ -1,0 +1,101 @@
+{
+  "total_points": 100,
+  "criteria": [
+    {
+      "id": 1,
+      "name": "Search Intent",
+      "max_score": 10,
+      "description": "Xác định đúng ý định tìm kiếm của từ khóa chính, đáp ứng đúng nhu cầu người dùng, không lệch chủ đề."
+    },
+    {
+      "id": 2,
+      "name": "Tiêu đề SEO (H1 / Title)",
+      "max_score": 8,
+      "description": "Tối đa 60 ký tự, chứa từ khóa chính ở đầu, thu hút click, không Title Case, không chứa từ cấm."
+    },
+    {
+      "id": 3,
+      "name": "URL Slug",
+      "max_score": 5,
+      "description": "Chứa từ khóa chính không dấu, phân tách bằng dấu gạch ngang, < 60 ký tự, không ký tự lạ."
+    },
+    {
+      "id": 4,
+      "name": "Thẻ mô tả Meta Description",
+      "max_score": 7,
+      "description": "Tối đa 160 ký tự, chứa từ khóa chính, tóm tắt bài viết, có CTA kích thích click."
+    },
+    {
+      "id": 5,
+      "name": "Mở bài (Sapo)",
+      "max_score": 7,
+      "description": "Tối đa 2 đoạn văn; Dòng 1 chứa từ khóa chính in đậm; Nêu trực diện nỗi đau và giải pháp; Cấm mở bài sáo rỗng."
+    },
+    {
+      "id": 6,
+      "name": "Nội dung chính",
+      "max_score": 12,
+      "description": "Giải quyết trọn vẹn vấn đề, có thông tin thực tế, có ví dụ minh họa và dữ liệu sâu sắc."
+    },
+    {
+      "id": 7,
+      "name": "Semantic SEO & LSI",
+      "max_score": 10,
+      "description": "Bao phủ từ khóa phụ, từ khóa ngữ nghĩa LSI tự nhiên; Có phần giải đáp thắc mắc FAQs."
+    },
+    {
+      "id": 8,
+      "name": "Ảnh bìa (Featured Image)",
+      "max_score": 5,
+      "description": "Có chỉ định và mô tả ảnh bìa phù hợp chủ đề."
+    },
+    {
+      "id": 9,
+      "name": "Hình ảnh trong bài & Alt Text",
+      "max_score": 4,
+      "description": "Có các khối mô tả ảnh [ảnh ...] dưới các mục, có Alt text mô tả nội dung ảnh."
+    },
+    {
+      "id": 10,
+      "name": "Liên kết nội bộ (Internal Links)",
+      "max_score": 6,
+      "description": "Đúng ngữ cảnh, Anchor text tự nhiên. Quy định: <1000 từ có 2-3 link, 1000-1500 từ có 3-4 link, 2000-3000 từ có 5-6 link."
+    },
+    {
+      "id": 11,
+      "name": "Lời kêu gọi hành động (CTA)",
+      "max_score": 3,
+      "description": "Có CTA rõ ràng, có giá trị, đặt ở kết bài hoặc vị trí hợp lý."
+    },
+    {
+      "id": 12,
+      "name": "Tính dễ đọc (Readability)",
+      "max_score": 5,
+      "description": "Phân cấp H2/H3 hợp lý, câu ngắn < 25 từ, đoạn ≤ 5 câu, có bullet/list rõ ràng."
+    },
+    {
+      "id": 13,
+      "name": "Tính chỉn chu",
+      "max_score": 3,
+      "description": "Không lỗi chính tả, chuẩn dấu câu, heading đúng cấp bậc, không để lọt rác markdown thô."
+    },
+    {
+      "id": 14,
+      "name": "Tính độc đáo (Unique Value)",
+      "max_score": 4,
+      "description": "Khai thác góc nhìn thực tế từ video, có trải nghiệm sâu sắc, không sao chép hời hợt."
+    },
+    {
+      "id": 15,
+      "name": "Tối ưu câu trả lời AI (AEO)",
+      "max_score": 6,
+      "description": "Có câu trả lời định nghĩa trực tiếp cho AI Overviews/Featured Snippets, có bảng đối chiếu so sánh."
+    },
+    {
+      "id": 16,
+      "name": "Mật độ từ khóa (Keyword Density)",
+      "max_score": 5,
+      "description": "Mật độ từ khóa chính: < 1.5% là tốt nhất; 1.5% - 3% là chấp nhận được; > 3% là nhồi nhét."
+    }
+  ]
+}

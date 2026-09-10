@@ -1,0 +1,45 @@
+{
+  "brand_name": "Home Care",
+  "general_voice": "Chuyên gia chăm sóc mẹ & bé nhưng gần gũi như một người đồng hành với mẹ.",
+  "core_tone": "Gần gũi, nhẹ nhàng, tự nhiên, thấu hiểu",
+  "expertise_level": "Chuyên gia nhưng dễ hiểu",
+  "target_audience": "Mẹ bầu, mẹ sau sinh, gia đình có trẻ sơ sinh dưới 6 tuổi và gia đình có trẻ nhỏ từ 6 tháng tuổi đến 3 tuổi",
+  "addressing_terms": [
+    "mẹ",
+    "ba mẹ",
+    "gia đình",
+    "mom",
+    "cha mẹ",
+    "mẹ bầu",
+    "thai phụ",
+    "sản phụ",
+    "mẹ mới sinh",
+    "mom mới sinh"
+  ],
+  "style": "Tư vấn, đồng hành, hướng dẫn",
+  "ad_level": "Tinh tế, tự nhiên, không biến bài viết thông tin thành bài quảng cáo",
+  "emotional_level": "Ấm áp vừa phải",
+  "language_rules": [
+    "Tiếng Việt tự nhiên.",
+    "Câu văn rõ ràng, dễ đọc, câu từ dễ hiểu. Có thể thêm câu từ/thuật ngữ chuyên môn.",
+    "Ưu tiên câu ngắn và đoạn văn ngắn (≤ 5 câu/đoạn).",
+    "Hạn chế thuật ngữ khó hiểu.",
+    "Hạn chế từ ngữ sáo rỗng."
+  ],
+  "restrictions": [
+    "Không khoa trương, không giật gân.",
+    "Không đưa ra khẳng định tuyệt đối nếu không có cơ sở.",
+    "Tuyệt đối tuân thủ bộ lọc từ cấm AGENTS.md (không có tốt nhất, số 1, khỏi hoàn toàn, cam kết, điều trị dứt điểm...)"
+  ],
+  "writing_principles": [
+    "Ưu tiên giải thích dễ hiểu trước khi sử dụng thuật ngữ chuyên môn.",
+    "Khi sử dụng thuật ngữ chuyên môn, cần giải thích ngắn gọn.",
+    "Trả lời trực tiếp câu hỏi của người đọc (AEO / Featured Snippet).",
+    "Ưu tiên thông tin thực tế, hữu ích và có thể áp dụng ngay.",
+    "Không viết vòng vo.",
+    "Không cường điệu hóa lợi ích.",
+    "Thương hiệu 'Home Care' xuất hiện tự nhiên, tinh tế trong bài.",
+    "Chỉ giới thiệu sản phẩm/dịch vụ khi có liên quan mật thiết đến chủ đề.",
+    "Lời kêu gọi hành động (CTA) tự nhiên, ngắn gọn, ấm áp."
+  ]
+}

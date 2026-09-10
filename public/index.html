@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube to SEO Article Generator - Chuẩn SEO, Semantic & AEO</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="container header-container">
+      <div class="logo-area">
+        <div class="logo-icon">🎥 ➔ ✍️</div>
+        <div>
+          <h1 class="logo-title">YouTube SEO Content Master</h1>
+          <p class="logo-subtitle">Chuyển đổi Video YouTube thành Bài viết Chuẩn SEO, Semantic & AEO bằng LLM Pipeline</p>
+        </div>
+      </div>
+      <div class="header-status">
+        <button type="button" id="btn-header-quick-model" class="btn-header-model" title="Bấm để đổi nhanh AI Model bất kỳ lúc nào">
+          <span class="header-model-icon">🤖</span>
+          <span id="header-model-name">Model: Đang nạp...</span>
+          <span class="header-model-caret">▾</span>
+        </button>
+        <span id="api-status-badge" class="badge badge-neutral">Đang kiểm tra API...</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- STEPPER WIZARD (5 STEPS) -->
+  <div class="stepper-wrapper">
+    <div class="container">
+      <ul class="stepper">
+        <li class="step-item active" data-step="1">
+          <div class="step-number">1</div>
+          <div class="step-label">Nhập Link & API</div>
+        </li>
+        <li class="step-item" data-step="2">
+          <div class="step-number">2</div>
+          <div class="step-label">Phân Tích & Từ Khóa</div>
+        </li>
+        <li class="step-item" data-step="3">
+          <div class="step-number">3</div>
+          <div class="step-label">Brief & Dàn Ý</div>
+        </li>
+        <li class="step-item" data-step="4">
+          <div class="step-number">4</div>
+          <div class="step-label">Biên Tập Nội Dung</div>
+        </li>
+        <li class="step-item" data-step="5">
+          <div class="step-number">5</div>
+          <div class="step-label">Điểm SEO & Xuất Bản</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- MAIN CONTAINER -->
+  <main class="container main-content">
+
+    <!-- BƯỚC 1: NHẬP LINK YOUTUBE & API KEYS -->
+    <section id="step-1" class="step-content active">
+      <div class="card">
+        <div class="card-header">
+          <h2>1. Nhập Đường Dẫn YouTube & Cấu Hình Khởi Tạo</h2>
+          <p class="text-muted">Nhập link video bạn muốn chuyển thể thành bài viết chuyên sâu. Bạn có thể tùy chọn nhập API Key riêng hoặc dùng mặc định từ server.</p>
+        </div>
+
+        <div class="card-body">
+          <div class="form-group">
+            <label for="yt-url" class="form-label">Đường dẫn Video YouTube <span class="required">*</span></label>
+            <div class="input-with-icon">
+              <input type="text" id="yt-url" class="form-control" placeholder="Ví dụ: https://www.youtube.com/watch?v=... hoặc https://youtu.be/..." />
+            </div>
+            <small class="text-hint">Hỗ trợ đầy đủ các định dạng: link video chuẩn, link rút gọn youtu.be, link shorts.</small>
+          </div>
+
+          <!-- COLLAPSIBLE API KEYS SETTINGS -->
+          <div class="api-settings-box">
+            <div class="api-toggle-header" id="toggle-api-settings">
+              <span>⚙️ Cài đặt OpenRouter API Key & Model AI</span>
+              <span class="toggle-icon">▼</span>
+            </div>
+            <div class="api-settings-body" id="api-settings-body">
+              <div class="form-row">
+                <div class="form-group col-6">
+                  <label for="openrouter-key" class="form-label">OpenRouter API Key (sk-or-v1-...) <span class="required">*</span></label>
+                  <input type="password" id="openrouter-key" class="form-control" placeholder="sk-or-v1-..." />
+                  <small class="text-hint">Lấy key tại <a href="https://openrouter.ai/keys" target="_blank" style="color:var(--primary);text-decoration:underline;">openrouter.ai/keys</a> (hoặc lưu trong openrouter.yaml).</small>
+                </div>
+                <div class="form-group col-6">
+                  <div class="model-label-row">
+                    <label for="openrouter-model" class="form-label" style="margin-bottom: 0;">Model LLM (Tất cả 400+ model OpenRouter) <span class="required">*</span></label>
+                    <span id="model-count-badge" class="model-badge">Đang nạp model...</span>
+                  </div>
+                  <input type="text" id="openrouter-model" list="model-datalist" class="form-control" placeholder="Gõ tìm hoặc nhập Model ID bất kỳ..." value="openai/gpt-4o-mini" autocomplete="off" />
+                  <datalist id="model-datalist">
+                    <option value="openai/gpt-4o-mini">⚡ OpenAI: GPT-4o Mini (Siêu tốc ~2s, Tiết kiệm nhất, 100% tiếng Việt chuẩn)</option>
+                    <option value="deepseek/deepseek-chat">DeepSeek: DeepSeek V3</option>
+                    <option value="openrouter/free">✨ OpenRouter Auto Free (100% Miễn phí)</option>
+                    <option value="google/gemini-2.5-flash">Google: Gemini 2.5 Flash</option>
+                    <option value="anthropic/claude-sonnet-4.5">Anthropic: Claude Sonnet 4.5</option>
+                    <option value="openai/gpt-4o">OpenAI: GPT-4o</option>
+                    <option value="deepseek/deepseek-r1">DeepSeek: DeepSeek R1</option>
+                    <option value="meta-llama/llama-3.3-70b-instruct">Meta: Llama 3.3 70B</option>
+                    <option value="qwen/qwen-2.5-72b-instruct">Qwen: Qwen 2.5 72B</option>
+                  </datalist>
+                  <div class="model-quick-tags" id="model-quick-tags">
+                    <span class="quick-tags-title">Gợi ý nhanh:</span>
+                    <button type="button" class="btn-model-tag active" data-model="openai/gpt-4o-mini" style="background:#e8f0fe;border-color:#1a73e8;color:#1a73e8;font-weight:700;">⚡ GPT-4o Mini (Siêu tốc ~2s - Khuyên dùng)</button>
+                    <button type="button" class="btn-model-tag" data-model="deepseek/deepseek-chat">DeepSeek V3</button>
+                    <button type="button" class="btn-model-tag" data-model="openrouter/free" style="background:#e6f4ea;border-color:#137333;color:#137333;font-weight:700;">✨ Auto Free</button>
+                    <button type="button" class="btn-model-tag" data-model="google/gemini-2.5-flash">Gemini 2.5</button>
+                    <button type="button" class="btn-model-tag" data-model="anthropic/claude-sonnet-4.5">Claude Sonnet 4.5</button>
+                  </div>
+                  <small class="text-hint">Hỗ trợ tất cả 400+ model OpenRouter. Khuyên dùng <b>GPT-4o Mini</b> (tạo bài siêu nhanh ~2s, không lỗi chữ Hán) hoặc <b>Auto Free</b> (miễn phí).</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="action-bar">
+            <button id="btn-fetch-data" class="btn btn-primary btn-lg">
+              <span class="btn-text">🚀 Thu Thập Dữ Liệu Video</span>
+              <span class="btn-spinner hidden"></span>
+            </button>
+          </div>
+
+          <!-- PREVIEW VIDEO CARD (Hidden initially) -->
+          <div id="video-preview-card" class="video-preview-card hidden">
+            <div class="video-preview-thumb">
+              <img id="preview-thumb-img" src="" alt="Thumbnail" />
+            </div>
+            <div class="video-preview-info">
+              <h3 id="preview-title" class="video-title">Tiêu đề video</h3>
+              <p class="video-meta"><strong id="preview-channel">Kênh</strong> • <span id="preview-stats">Lượt xem</span></p>
+              <div id="transcript-status" class="transcript-badge">Đang kiểm tra phụ đề...</div>
+              
+              <details class="transcript-details">
+                <summary>Xem hoặc chỉnh sửa nội dung Transcript phụ đề</summary>
+                <textarea id="transcript-text" class="form-control transcript-textarea" rows="6" placeholder="Nội dung lời thoại của video..."></textarea>
+              </details>
+            </div>
+            <div class="video-preview-action">
+              <button id="btn-proceed-step2" class="btn btn-success">Tiếp Tục Phân Tích Nội Dung ➔</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- BƯỚC 2: PHÂN TÍCH NỘI DUNG & CHỌN TỪ KHÓA SEO -->
+    <section id="step-2" class="step-content hidden">
+      <div class="card">
+        <div class="card-header">
+          <h2>2. Phân Tích Nội Dung, Thực Thể & Gợi Ý Từ Khóa SEO</h2>
+          <p class="text-muted">LLM Agent 1 đã phân tích Topic/Entity/Context. LLM Agent 2 đã nghiên cứu Search Intent và đề xuất từ khóa tiềm năng.</p>
+        </div>
+
+        <div class="card-body">
+          <div class="analysis-grid">
+            <div class="analysis-box">
+              <h4>🎯 Chủ Đề Cốt Lõi & Bối Cảnh</h4>
+              <p id="analysis-topic" class="highlight-text"></p>
+              <p id="analysis-summary" class="text-muted"></p>
+            </div>
+            <div class="analysis-box">
+              <h4>⚡ Nỗi Đau Khách Hàng (User Pain Points)</h4>
+              <ul id="analysis-painpoints" class="feature-list"></ul>
+            </div>
+            <div class="analysis-box">
+              <h4>🏷️ Thực Thể Semantic (Entities)</h4>
+              <div id="analysis-entities" class="tag-cloud"></div>
+            </div>
+            <div class="analysis-box">
+              <h4>💎 Giá Trị Khác Biệt Từ Video</h4>
+              <ul id="analysis-values" class="feature-list"></ul>
+            </div>
+          </div>
+
+          <hr class="divider">
+
+          <div class="keyword-selection-area">
+            <h3>🔑 Chọn Từ Khóa SEO Chính</h3>
+            <p class="text-muted">Chọn 1 từ khóa từ danh sách gợi ý của AI hoặc tự nhập từ khóa bạn muốn xếp hạng:</p>
+
+            <div id="keywords-container" class="keywords-list"></div>
+
+            <div class="custom-kw-input-box">
+              <label for="custom-keyword" class="form-label">Hoặc tự chỉnh sửa/nhập từ khóa chính khác:</label>
+              <input type="text" id="custom-keyword" class="form-control" placeholder="Nhập từ khóa chính mong muốn..." />
+            </div>
+          </div>
+
+          <hr class="divider">
+
+          <!-- LIÊN KẾT NỘI BỘ (TÙY CHỌN - TỰ NHẬP ANCHOR TEXT & LINK) -->
+          <div class="customizations-area">
+            <div class="api-toggle-header" id="toggle-customizations">
+              <span>🔗 Bể Liên Kết Nội Bộ - Internal Links (Tùy Chọn)</span>
+              <span class="toggle-icon">▼</span>
+            </div>
+            <div class="api-settings-body" id="customizations-body">
+              <div class="internal-links-header">
+                <div>
+                  <label class="form-label" style="margin-bottom: 2px;">Danh Sách Liên Kết Nội Bộ Để AI Tự Động Chèn</label>
+                  <small class="text-hint">Nhập Anchor Text và Link website của bạn. AI sẽ phân tích ngữ cảnh để chèn 2–4 link tự nhiên nhất vào bài viết.</small>
+                </div>
+                <button type="button" id="btn-add-link-row" class="btn btn-outline btn-sm">➕ Thêm Dòng Link</button>
+              </div>
+
+              <!-- Container hiển thị các hàng Link -->
+              <div id="internal-links-container" class="internal-links-list">
+                <!-- Render động bởi app.js -->
+              </div>
+
+              <!-- Footer với chức năng phụ -->
+              <div class="internal-links-footer">
+                <button type="button" id="btn-toggle-quick-paste" class="btn-text-link">📝 Nhập nhanh hàng loạt dạng Text</button>
+                <button type="button" id="btn-clear-all-links" class="btn-text-link text-danger">🗑️ Xóa tất cả</button>
+              </div>
+
+              <!-- Khung nhập nhanh hàng loạt -->
+              <div id="quick-paste-box" class="quick-paste-box hidden">
+                <textarea id="quick-paste-textarea" class="form-control" rows="3" placeholder="Dán danh sách mỗi dòng 1 link theo dạng: Anchor text | URL&#10;Ví dụ:&#10;dịch vụ chăm sóc mẹ sau sinh | https://yourwebsite.com/dich-vu&#10;cẩm nang dinh dưỡng cho bé | https://yourwebsite.com/dinh-duong"></textarea>
+                <div style="margin-top: 8px; text-align: right;">
+                  <button type="button" id="btn-apply-quick-paste" class="btn btn-primary btn-sm">Thêm Vào Danh Sách</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="action-bar between">
+            <button class="btn btn-secondary btn-prev" data-target="1">⬅ Quay Lại Bước 1</button>
+            <button id="btn-create-outline" class="btn btn-primary btn-lg">
+              <span class="btn-text">Tạo Content Brief & Dàn Ý Outline ➔</span>
+              <span class="btn-spinner hidden"></span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- BƯỚC 3: DUYỆT & CHỈNH SỬA DÀN Ý OUTLINE -->
+    <section id="step-3" class="step-content hidden">
+      <div class="card">
+        <div class="card-header">
+          <h2>3. Xem Xét & Duyệt Dàn Ý Bài Viết (Content Brief & Outline)</h2>
+          <p class="text-muted">Dàn ý được thiết lập theo cấu trúc H1-H4 chuẩn logic, áp dụng công thức 218 Tiêu đề CTR và quy định mở bài Sapo chuẩn của dự án.</p>
+        </div>
+
+        <div class="card-body">
+          <div class="brief-card">
+            <h3>📋 Content Brief Tóm Tắt</h3>
+            <div class="brief-grid">
+              <div><strong>Từ khóa chính:</strong> <span id="brief-kw" class="badge badge-primary"></span></div>
+              <div><strong>Search Intent:</strong> <span id="brief-intent" class="badge badge-success"></span></div>
+              <div><strong>Tiêu đề SEO đề xuất:</strong> <span id="brief-seotitle"></span></div>
+              <div><strong>URL Slug:</strong> <code id="brief-slug"></code></div>
+            </div>
+            <div class="brief-desc">
+              <strong>Meta Description:</strong> <span id="brief-meta"></span>
+            </div>
+          </div>
+
+          <div class="outline-editor-area">
+            <div class="outline-header d-flex justify-between align-center">
+              <div>
+                <h3>Dàn Ý Bài Viết (Thêm/Sửa/Xóa Đề Mục & Tùy Biến Video, Bảng, Link, SP/Dịch Vụ)</h3>
+                <span class="badge badge-info">Quy chuẩn: Chỉ viết hoa chữ đầu, cấm dấu hai chấm</span>
+              </div>
+              <div class="outline-top-actions">
+                <button type="button" id="btn-add-outline-heading-top" class="btn btn-primary btn-sm">➕ Thêm Thẻ Tiêu Đề</button>
+              </div>
+            </div>
+
+            <div id="outline-items-container" class="outline-list"></div>
+
+            <div class="outline-bottom-bar mt-4">
+              <button type="button" id="btn-add-outline-heading-bottom" class="btn btn-outline btn-block">➕ Thêm Thẻ Tiêu Đề Mới (H2 / H3 / H4)</button>
+            </div>
+          </div>
+
+          <div class="action-bar between">
+            <button class="btn btn-secondary btn-prev" data-target="2">⬅ Quay Lại Bước 2</button>
+            <button id="btn-write-article" class="btn btn-success btn-lg">
+              <span class="btn-text">✨ Chuyển Đổi Thành Bài Viết Chuẩn SEO ➔</span>
+              <span class="btn-spinner hidden"></span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- BƯỚC 4: MÀN HÌNH BIÊN TẬP BÀI VIẾT (HUMAN-IN-THE-LOOP EDITOR) -->
+    <section id="step-4" class="step-content hidden">
+      <div class="card">
+        <div class="card-header d-flex justify-between align-center">
+          <div>
+            <h2>4. Biên Tập & Hoàn Thiện Bài Viết (Human-in-the-loop)</h2>
+            <p class="text-muted">Agent 4 đã soạn thảo bài viết hoàn chỉnh. Tại đây bạn có thể thêm bớt ảnh, chèn thêm link, chỉnh sửa câu chữ trước khi chấm điểm.</p>
+          </div>
+          <div class="editor-quick-stats">
+            <span id="editor-word-count" class="badge badge-neutral">0 từ</span>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <!-- CẤU HÌNH SEO METADATA -->
+          <div class="editor-meta-box">
+            <div class="form-row">
+              <div class="form-group col-6">
+                <label class="form-label">Tiêu đề bài viết (H1 - Post Title)</label>
+                <input type="text" id="edit-h1" class="form-control" />
+              </div>
+              <div class="form-group col-6">
+                <label class="form-label">Tiêu đề SEO (Meta Title - dưới 60 ký tự)</label>
+                <input type="text" id="edit-meta-title" class="form-control" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-4">
+                <label class="form-label">URL Slug</label>
+                <input type="text" id="edit-slug" class="form-control" />
+              </div>
+              <div class="form-group col-8">
+                <label class="form-label">Thẻ mô tả (Meta Description - dưới 160 ký tự)</label>
+                <input type="text" id="edit-meta-desc" class="form-control" />
+              </div>
+            </div>
+          </div>
+
+          <!-- EDITOR TOOLBAR WITH MODE SWITCHER -->
+          <div class="editor-toolbar d-flex justify-between align-center">
+            <div class="toolbar-left d-flex align-center" style="gap: 8px; flex-wrap: wrap;">
+              <div class="toolbar-group">
+                <button type="button" class="btn-tool" id="tool-bold" title="In đậm (Ctrl+B)"><strong>B</strong></button>
+                <button type="button" class="btn-tool" id="tool-italic" title="In nghiêng (Ctrl+I)"><em>I</em></button>
+                <button type="button" class="btn-tool" id="tool-h2" title="Thẻ Tiêu Đề H2">H2</button>
+                <button type="button" class="btn-tool" id="tool-h3" title="Thẻ Tiêu Đề H3">H3</button>
+                <button type="button" class="btn-tool" id="tool-ul" title="Danh Sách Dấu Chấm Bullet List (•)">• List</button>
+                <button type="button" class="btn-tool" id="tool-ol" title="Danh Sách Số Thứ Tự (1.)">1. List</button>
+              </div>
+              <div class="toolbar-group">
+                <button type="button" class="btn-tool btn-tool-action" id="tool-add-link">🔗 Thêm Link</button>
+                <button type="button" class="btn-tool btn-tool-action" id="tool-add-table">📊 Thêm Bảng</button>
+                <button type="button" class="btn-tool btn-tool-action" id="tool-add-image">📷 Thêm Ảnh</button>
+                <button type="button" class="btn-tool btn-tool-action" id="tool-add-video">🎬 Chèn Lại Video</button>
+              </div>
+            </div>
+            <div class="toolbar-right">
+              <div class="editor-view-toggle">
+                <button type="button" class="btn-toggle-view active" id="btn-view-visual" title="Soạn thảo trực quan WYSIWYG">👁️ Trực Quan (Soạn Thảo)</button>
+                <button type="button" class="btn-toggle-view" id="btn-view-markdown" title="Xem & sửa mã Markdown">📄 Mã Markdown</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- EDITOR WORKSPACE -->
+          <div class="editor-workspace">
+            <!-- PANE 1: TRỰC QUAN (MẶC ĐỊNH HIỂN THỊ) -->
+            <div id="visual-editor-container" class="editor-pane-container">
+              <div class="pane-header d-flex justify-between align-center">
+                <label class="form-label mb-0">👁️ Soạn Thảo Trực Quan (Gõ & Chỉnh Sửa Trực Tiếp Như Word):</label>
+                <small class="text-hint">Bảng biểu & bullet list định dạng chuẩn, tự động đồng bộ sang Markdown</small>
+              </div>
+              <div id="editor-visual" class="visual-editor" contenteditable="true" spellcheck="false" placeholder="Nội dung bài viết bắt đầu từ Sapo..."></div>
+            </div>
+
+            <!-- PANE 2: MÃ MARKDOWN (ẨN MẶC ĐỊNH) -->
+            <div id="markdown-editor-container" class="editor-pane-container hidden">
+              <div class="pane-header d-flex justify-between align-center">
+                <label class="form-label mb-0">📄 Mã Nguồn Markdown (Tự động đồng bộ 2 chiều):</label>
+                <small class="text-hint">Chỉnh sửa trực tiếp mã markdown nếu muốn tùy biến nâng cao</small>
+              </div>
+              <textarea id="editor-markdown" class="editor-textarea" rows="22" placeholder="Nội dung bài viết dạng Markdown..."></textarea>
+            </div>
+          </div>
+
+          <div class="action-bar between mt-4">
+            <button class="btn btn-secondary btn-prev" data-target="3">⬅ Quay Lại Dàn Ý</button>
+            <button id="btn-run-seo-grade" class="btn btn-primary btn-lg">
+              <span class="btn-text">🔍 Chấm Điểm SEO & Kiểm Định Chất Lượng ➔</span>
+              <span class="btn-spinner hidden"></span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- BƯỚC 5: ĐIỂM SEO, XUẤT BẢN & ĐẨY LÊN WORDPRESS -->
+    <section id="step-5" class="step-content hidden">
+      <div class="card">
+        <div class="card-header">
+          <h2>5. Báo Cáo Chấm Điểm 16 Tiêu Chí & Xuất Bản Lên Website</h2>
+          <p class="text-muted">Agent 5 và Hệ thống Kiểm Định đã đánh giá chi tiết bài viết đã qua biên tập của bạn.</p>
+        </div>
+
+        <div class="card-body">
+          <!-- BẢNG ĐIỂM SEO 16 TIÊU CHÍ (100 ĐIỂM) -->
+          <div id="seo-score-box" class="seo-score-box">
+            <div class="score-summary">
+              <div class="score-circle">
+                <span id="score-number" class="score-val">0</span>
+                <span class="score-total">/100</span>
+              </div>
+              <div class="score-info">
+                <h3>Xếp Loại Bài Viết: <span id="score-grade">...</span> <span id="score-badge">🟢</span></h3>
+                <p id="score-kw-stats" class="text-muted">Mật độ từ khóa chính: 0% | Độ dài: 0 từ</p>
+                <div id="score-alerts-area" class="score-alerts"></div>
+              </div>
+            </div>
+
+            <!-- COLLAPSIBLE 16 TIÊU CHÍ DETAIL -->
+            <details class="score-detail-accordion">
+              <summary>Xem chi tiết bảng chấm điểm 16 tiêu chí (Click để mở)</summary>
+              <div id="criteria-table-container" class="criteria-table-container"></div>
+            </details>
+          </div>
+
+          <!-- KHUNG ĐẨY THẲNG LÊN WORDPRESS QUA REST API -->
+          <div class="wp-publish-box">
+            <div class="wp-publish-header">
+              <div class="wp-logo">🌐</div>
+              <div>
+                <h3>Đẩy Thẳng Lên Website WordPress (Tùy Chọn)</h3>
+                <p class="text-muted">Tự động cấu hình Yoast SEO Meta, xóa sạch rác markdown, làm sạch HTML đúng chuẩn CMS.</p>
+              </div>
+            </div>
+
+            <div class="wp-form-body">
+              <div class="form-row">
+                <div class="form-group col-6">
+                  <label class="form-label">Link Website WordPress <span class="required">*</span></label>
+                  <input type="text" id="wp-url" class="form-control" placeholder="Ví dụ: https://yourwebsite.com" />
+                  <small class="text-hint">Link trang chủ WordPress của bạn</small>
+                </div>
+                <div class="form-group col-6">
+                  <label class="form-label">API Key / Token WordPress <span class="required">*</span></label>
+                  <input type="password" id="wp-api-key" class="form-control" placeholder="Nhập API Token hoặc user:application_password" />
+                  <small class="text-hint">Nhập API Key/Token WordPress, hoặc định dạng <code>user:application_password</code></small>
+                </div>
+              </div>
+
+              <div class="form-row align-center">
+                <div class="form-group col-6">
+                  <label class="form-label">Trạng Thái Bài Viết Trên Website</label>
+                  <select id="wp-status" class="form-control">
+                    <option value="draft" selected>Bản nháp (Draft - Khuyên dùng)</option>
+                    <option value="publish">Xuất bản công khai ngay (Publish)</option>
+                  </select>
+                </div>
+                <div class="form-group col-6" style="margin-top: 24px;">
+                  <button id="btn-push-wordpress" class="btn btn-success btn-lg" style="width: 100%;">
+                    <span class="btn-text">🚀 Đẩy Thẳng Lên Website WordPress</span>
+                    <span class="btn-spinner hidden"></span>
+                  </button>
+                </div>
+              </div>
+
+              <div id="wp-result-alert" class="wp-result-alert hidden"></div>
+            </div>
+          </div>
+
+          <hr class="divider">
+
+          <!-- EXPORT TOOLBAR -->
+          <div class="export-toolbar">
+            <div class="tabs-nav">
+              <button class="tab-btn active" data-tab="preview">👁️ Xem Trước Google SERP</button>
+              <button class="tab-btn" data-tab="clean-html">🌐 HTML Sạch Classic Editor</button>
+              <button class="tab-btn" data-tab="markdown">📄 Markdown</button>
+            </div>
+            <div class="export-actions">
+              <button id="btn-copy-content" class="btn btn-outline">📋 Copy Markdown</button>
+              <button id="btn-copy-html" class="btn btn-outline">📋 Copy Clean HTML</button>
+              <button id="btn-download-docx" class="btn btn-primary">📥 Tải File Word (.docx)</button>
+              <button id="btn-download-md" class="btn btn-secondary">📥 Tải File .MD</button>
+            </div>
+          </div>
+
+          <!-- TAB CONTENT PANELS -->
+          <div class="tab-panels">
+            <div id="tab-preview" class="tab-panel active">
+              <div class="meta-preview-box">
+                <div class="google-serp-preview">
+                  <div class="serp-url" id="serp-url-display">https://yourwebsite.com/slug-bai-viet</div>
+                  <div class="serp-title" id="serp-title-display">Tiêu đề SEO bài viết</div>
+                  <div class="serp-desc" id="serp-desc-display">Mô tả Meta Description...</div>
+                </div>
+              </div>
+              <article id="article-preview-body" class="article-render-body"></article>
+            </div>
+
+            <div id="tab-clean-html" class="tab-panel hidden">
+              <p class="text-hint">Mã HTML đã được làm sạch 100%: Không chứa H1 trong thân bài, thẻ H2/H3 viết hoa chuẩn, responsive video iframe, bảng table chuẩn, không chứa ký tự markdown thô.</p>
+              <textarea id="html-raw-content" class="code-textarea" rows="18" readonly></textarea>
+            </div>
+
+            <div id="tab-markdown" class="tab-panel hidden">
+              <textarea id="md-raw-content" class="code-textarea" rows="18" readonly></textarea>
+            </div>
+          </div>
+
+          <div class="action-bar between mt-4">
+            <button class="btn btn-secondary btn-prev" data-target="4">⬅ Quay Lại Chỉnh Sửa</button>
+            <button id="btn-restart" class="btn btn-outline">🔄 Tạo Bài Viết Mới</button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- LOADING OVERLAY -->
+  <div id="loading-overlay" class="loading-overlay hidden">
+    <div class="loading-card">
+      <div class="loading-spinner-large"></div>
+      <h3 id="loading-title">AI Đang Xử Lý...</h3>
+      <p id="loading-desc" class="text-muted">Vui lòng đợi giây lát trong khi LLM phân tích chuyên sâu.</p>
+      
+      <!-- REAL-TIME TIMER & LIVE STATUS MILESTONE -->
+      <div class="loading-timer-badge" style="display:inline-flex; align-items:center; gap:6px; background:#f1f3f4; padding:4px 12px; border-radius:20px; font-size:13px; color:#444; font-weight:600; margin:10px 0 6px 0;">
+        <span>⏱️ Thời gian:</span>
+        <span id="loading-elapsed-seconds" style="color:var(--primary); font-family:monospace; font-size:14px; font-weight:700;">0s</span>
+      </div>
+
+      <div class="loading-progress-bar">
+        <div id="loading-progress-fill" class="loading-progress-fill"></div>
+      </div>
+
+      <div class="loading-live-status" id="loading-live-status" style="font-size:12px; color:#555; margin-top:8px; font-style:italic; min-height:18px;">
+        Đang gửi yêu cầu tới AI Model...
+      </div>
+
+      <div class="loading-cancel-wrap" style="margin-top: 18px;">
+        <button type="button" id="btn-cancel-loading-switch-model" class="btn btn-sm" style="background:#fff; border: 1.5px solid #ea4335; color: #ea4335; font-weight: 600; padding: 7px 16px; border-radius: 8px; cursor: pointer; transition: all 0.2s ease;">
+          ⚡ Đang đợi lâu? Bấm để Hủy & Đổi Model Khác
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODEL ERROR & RETRY MODAL (ĐỔI MODEL NGAY TẠI CHỖ & THỬ LẠI KHÔNG MẤT DỮ LIỆU) -->
+  <div id="model-error-modal" class="modal-backdrop hidden">
+    <div class="modal-dialog">
+      <div class="modal-header modal-header-danger" id="error-modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon" id="error-modal-icon">⚠️</span>
+          <h3 class="modal-title" id="error-modal-title">Gặp Lỗi Khi Gọi AI Model</h3>
+        </div>
+        <button type="button" class="btn-close-modal" id="btn-close-error-modal" title="Đóng">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="error-step-badge" id="error-modal-step-tag">📍 Đang ở: Bước 4 (Viết bài SEO)</div>
+        <div class="error-detail-box" id="error-modal-message">
+          Lỗi kết nối hoặc tài khoản không đủ credit.
+        </div>
+        <div class="error-suggestion-tip">
+          💡 <strong>Không lo mất dữ liệu!</strong> Toàn bộ dàn ý, từ khóa và nội dung đã sửa của bạn vẫn được bảo toàn nguyên vẹn 100%. Hãy chọn model khác bên dưới rồi bấm <strong>"Thử Lại Ngay"</strong> để tiếp tục:
+        </div>
+        <div class="form-group mt-3">
+          <label class="form-label font-bold" for="modal-retry-model">Chọn Model Khác Để Tiếp Tục:</label>
+          <input type="text" id="modal-retry-model" list="model-datalist" class="form-control" placeholder="Gõ tìm hoặc chọn model từ danh sách..." autocomplete="off" />
+          <div class="model-quick-tags mt-2" id="modal-retry-quick-tags">
+            <span class="quick-tags-title">Gợi ý nhanh:</span>
+            <button type="button" class="btn-model-tag" data-model="openai/gpt-4o-mini" style="background:#e8f0fe;border-color:#1a73e8;color:#1a73e8;font-weight:700;">⚡ GPT-4o Mini (Siêu tốc ~2s)</button>
+            <button type="button" class="btn-model-tag" data-model="deepseek/deepseek-chat">DeepSeek V3</button>
+            <button type="button" class="btn-model-tag" data-model="openrouter/free" style="background:#e6f4ea;border-color:#137333;color:#137333;font-weight:700;">✨ Auto Free (Miễn phí)</button>
+            <button type="button" class="btn-model-tag" data-model="google/gemini-2.5-flash">Gemini 2.5 Flash</button>
+            <button type="button" class="btn-model-tag" data-model="deepseek/deepseek-r1">DeepSeek R1</button>
+            <button type="button" class="btn-model-tag" data-model="meta-llama/llama-3.3-70b-instruct">Llama 3.3</button>
+            <button type="button" class="btn-model-tag" data-model="anthropic/claude-sonnet-4.5">Claude Sonnet 4.5</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-cancel-error-modal">Đóng (Tự chỉnh sửa)</button>
+        <button type="button" class="btn btn-primary" id="btn-confirm-retry-model">
+          <span class="btn-text">🔄 Đổi Model & Thử Lại Ngay</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <div class="container">
+      <p>YouTube SEO Content Master &bull; Tuân thủ quy chuẩn SEO & Bộ lọc từ cấm <code>AGENTS.md</code> & Bộ tiêu chí 16 mục 100 điểm.</p>
+    </div>
+  </footer>
+
+  <script src="js/marked.umd.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
