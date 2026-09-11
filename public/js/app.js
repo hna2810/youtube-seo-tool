@@ -1040,10 +1040,24 @@ async function handleCreateOutline() {
       state.apiKey,
       state.model
     );
-    state.outlineData = outlineData;
-    if (outlineData && Array.isArray(outlineData.outline)) {
-      state.outlineData.outline = normalizeOutlineList(outlineData.outline);
+    state.outlineData = outlineData || {};
+    let rawList = outlineData?.outline || outlineData?.sections || outlineData?.headings || outlineData?.items || [];
+    if (!Array.isArray(rawList) || rawList.length === 0) {
+      const fallbackTitle = outlineData?.contentBrief?.seoMeta?.seoTitle || outlineData?.seoTitle || `Mọi điều bạn cần biết về ${state.selectedKeyword}`;
+      rawList = [
+        { level: 'H1', title: fallbackTitle },
+        { level: 'Sapo', guideline: `Đoạn 1: Thấu hiểu nỗi băn khoăn của mẹ khi tìm hiểu **${state.selectedKeyword}**.\nĐoạn 2: Giới thiệu giải pháp hữu ích và khoa học từ Home Care.` },
+        { level: 'H2', title: `Vì sao mẹ nên tìm hiểu ${state.selectedKeyword} đúng cách`, intent: 'Giải thích nguyên nhân cốt lõi và lợi ích' },
+        { level: 'H2', title: `Hướng dẫn chi tiết từng bước thực hiện ${state.selectedKeyword} tại nhà`, hasVideoEmbed: true, intent: 'Quy trình thực hiện chi tiết kèm video trực quan' },
+        { level: 'H2', title: `Bảng tổng hợp so sánh và các sai lầm phổ biến cần tránh`, hasComparisonTable: true, intent: 'Bảng đối chiếu và lưu ý an toàn' },
+        { level: 'H2', title: `Câu hỏi thường gặp về ${state.selectedKeyword}`, isFaq: true, items: [
+          { level: 'H3', title: `Thực hiện ${state.selectedKeyword} bao lâu một lần là phù hợp?` },
+          { level: 'H3', title: `Những lưu ý an toàn quan trọng nhất mẹ cần nhớ?` }
+        ]},
+        { level: 'H2', title: `Lời nhắn gửi yêu thương và đồng hành cùng mẹ từ Home Care`, isCta: true }
+      ];
     }
+    state.outlineData.outline = normalizeOutlineList(rawList);
 
     renderOutlineData(state.outlineData);
     goToStep(3);
@@ -1063,11 +1077,28 @@ async function handleCreateOutline() {
 function renderOutlineData(outlineData) {
   if (!outlineData) return;
   const brief = outlineData.contentBrief || {};
-  el.briefKw.textContent = state.selectedKeyword;
-  el.briefIntent.textContent = brief.searchIntent || 'Informational';
-  el.briefSeoTitle.textContent = brief.seoMeta?.seoTitle || '';
-  el.briefSlug.textContent = brief.seoMeta?.slug || '';
-  el.briefMeta.textContent = brief.seoMeta?.metaDescription || '';
+  const seoMeta = brief.seoMeta || {};
+  const kw = state.selectedKeyword || '';
+
+  el.briefKw.textContent = kw;
+  el.briefIntent.textContent = brief.searchIntent || `Tìm kiếm giải pháp, hướng dẫn an toàn và dễ thực hiện về "${kw}"`;
+
+  const seoTitle = seoMeta.seoTitle || brief.seoTitle || brief.metaTitle || outlineData.seoTitle || `Mọi điều bạn cần biết về ${kw}`;
+  const slug = seoMeta.slug || brief.slug || kw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-');
+  const metaDesc = seoMeta.metaDescription || brief.metaDescription || `Băn khoăn về ${kw}? Khám phá hướng dẫn chi tiết, an toàn tại nhà từ chuyên gia Home Care. Xem ngay mẹo hữu ích giúp mẹ an tâm!`;
+
+  el.briefSeoTitle.textContent = seoTitle;
+  el.briefSlug.textContent = slug;
+  el.briefMeta.textContent = metaDesc;
+
+  // Đồng bộ lại vào state.outlineData
+  if (!state.outlineData) state.outlineData = {};
+  if (!state.outlineData.contentBrief) state.outlineData.contentBrief = {};
+  if (!state.outlineData.contentBrief.seoMeta) state.outlineData.contentBrief.seoMeta = {};
+  state.outlineData.contentBrief.seoMeta.seoTitle = seoTitle;
+  state.outlineData.contentBrief.seoMeta.slug = slug;
+  state.outlineData.contentBrief.seoMeta.metaDescription = metaDesc;
+  state.outlineData.contentBrief.searchIntent = el.briefIntent.textContent;
 
   const outline = outlineData.outline || [];
   el.outlineContainer.innerHTML = '';

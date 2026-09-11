@@ -339,10 +339,18 @@ function _internalCleanAndParseJson(rawText) {
         }
         if (fallbackOutline.length > 0) {
           console.warn('[LLM Recovery] Phục hồi thành công outline qua Regex fallback:', fallbackOutline.length, 'mục');
+          const seoTitleMatch = text.match(/"seoTitle"\s*:\s*"([^"\r\n]+)"/i);
+          const slugMatch = text.match(/"slug"\s*:\s*"([^"\r\n]+)"/i);
+          const metaDescMatch = text.match(/"metaDescription"\s*:\s*"([^"\r\n]+)"/i);
+          const searchIntentMatch = text.match(/"searchIntent"\s*:\s*"([^"\r\n]+)"/i);
           return {
             contentBrief: {
-              searchIntent: 'Informational',
-              seoMeta: { seoTitle: '', slug: '', metaDescription: '' }
+              searchIntent: searchIntentMatch ? searchIntentMatch[1] : 'Informational',
+              seoMeta: {
+                seoTitle: seoTitleMatch ? seoTitleMatch[1] : (fallbackOutline.find(o => o.level === 'H1')?.title || ''),
+                slug: slugMatch ? slugMatch[1] : '',
+                metaDescription: metaDescMatch ? metaDescMatch[1] : ''
+              }
             },
             outline: fallbackOutline
           };
@@ -639,7 +647,8 @@ async function callGeminiDirect(apiKey, prompt, options = {}) {
       contents: [{ parts: [{ text: prompt }] }],
       generationConfig: {
         temperature: options.temperature !== undefined ? options.temperature : 0.7,
-        maxOutputTokens: options.maxTokens || 8192
+        maxOutputTokens: Math.max(options.maxTokens || 8192, 8192),
+        thinkingConfig: { thinkingBudget: 0 }
       },
       safetySettings: [
         { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },

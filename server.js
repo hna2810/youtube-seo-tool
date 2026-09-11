@@ -125,6 +125,169 @@ app.post('/api/suggest-keywords', async (req, res) => {
   }
 });
 
+function generateVietnameseSlug(str) {
+  if (!str) return '';
+  return str.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd').replace(/Đ/g, 'd')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+}
+
+function normalizeOutlineResponse(rawOutlineData, selectedKeyword, contentAnalysis = {}) {
+  const data = rawOutlineData && typeof rawOutlineData === 'object' ? { ...rawOutlineData } : {};
+
+  // 1. Chuẩn hóa Content Brief & SEO Meta
+  if (!data.contentBrief || typeof data.contentBrief !== 'object') {
+    data.contentBrief = {};
+  }
+  const brief = data.contentBrief;
+
+  // Search Intent
+  if (!brief.searchIntent || typeof brief.searchIntent !== 'string' || !brief.searchIntent.trim()) {
+    brief.searchIntent = `Tìm kiếm giải pháp, hướng dẫn an toàn, khoa học và dễ thực hiện tại nhà về "${selectedKeyword}"`;
+  }
+
+  // SEO Meta
+  if (!brief.seoMeta || typeof brief.seoMeta !== 'object') {
+    brief.seoMeta = {};
+  }
+
+  // SEO Title: < 60 ký tự, chứa từ khóa chính
+  let seoTitle = brief.seoMeta.seoTitle || brief.seoTitle || brief.metaTitle || data.seoTitle || data.title || '';
+  if (!seoTitle || !seoTitle.toLowerCase().includes(selectedKeyword.toLowerCase())) {
+    seoTitle = `Mọi điều bạn cần biết về ${selectedKeyword}`;
+  }
+  if (seoTitle.length > 60) {
+    seoTitle = seoTitle.substring(0, 58).trim();
+  }
+  brief.seoMeta.seoTitle = seoTitle;
+
+  // Slug: không dấu, gạch ngang, < 60 ký tự
+  let slug = brief.seoMeta.slug || brief.slug || generateVietnameseSlug(selectedKeyword);
+  if (!slug || slug.length > 60) {
+    slug = generateVietnameseSlug(selectedKeyword).substring(0, 55).replace(/-+$/, '');
+  }
+  brief.seoMeta.slug = slug;
+
+  // Meta Description: 140 - 160 ký tự, chứa từ khóa, có CTA
+  let metaDescription = brief.seoMeta.metaDescription || brief.metaDescription || '';
+  if (!metaDescription || !metaDescription.toLowerCase().includes(selectedKeyword.toLowerCase()) || metaDescription.length > 165) {
+    metaDescription = `Băn khoăn về ${selectedKeyword}? Khám phá hướng dẫn chi tiết, an toàn tại nhà từ chuyên gia Home Care. Xem ngay mẹo hữu ích giúp mẹ an tâm!`;
+  }
+  if (metaDescription.length > 160) {
+    metaDescription = metaDescription.substring(0, 158).trim();
+  }
+  brief.seoMeta.metaDescription = metaDescription;
+
+  // 2. Chuẩn hóa Mảng Dàn Ý (Outline)
+  let rawList = data.outline || data.sections || data.headings || data.items || data.dàn_ý || [];
+  if (!Array.isArray(rawList)) rawList = [];
+
+  // Nếu dàn ý bị rỗng hoặc quá ít đề mục (< 3 mục), tự động tạo dàn ý 7 phần hoàn chỉnh chuẩn SEO
+  if (rawList.length < 3) {
+    console.warn(`[Outline Normalizer] Dàn ý từ LLM có ${rawList.length} mục. Tự động kiến tạo dàn ý chuẩn 7 phần...`);
+    rawList = [
+      {
+        level: 'H1',
+        title: seoTitle
+      },
+      {
+        level: 'Sapo',
+        guideline: `Đoạn 1: Mở đầu trực diện xoáy vào nỗi băn khoăn và trải nghiệm thực tế của mẹ khi tìm kiếm **${selectedKeyword}**.\nĐoạn 2: Giới thiệu giải pháp hữu ích, khoa học và an toàn mà bài viết cùng Home Care mang lại.`
+      },
+      {
+        level: 'H2',
+        title: `Vì sao mẹ nên tìm hiểu ${selectedKeyword} an toàn và khoa học`,
+        intent: 'Giải thích nguyên nhân cốt lõi và lợi ích quan trọng nhất cho mẹ và bé'
+      },
+      {
+        level: 'H2',
+        title: `Hướng dẫn chi tiết cách thực hiện ${selectedKeyword} đúng chuẩn tại nhà`,
+        hasVideoEmbed: true,
+        intent: 'Quy trình từng bước chi tiết, kèm video trực quan minh họa'
+      },
+      {
+        level: 'H2',
+        title: `Bảng tổng hợp đối chiếu và các sai lầm phổ biến mẹ cần tránh`,
+        hasComparisonTable: true,
+        intent: 'Bảng so sánh tối ưu GEO/AI Search và các lưu ý an toàn thực tế'
+      },
+      {
+        level: 'H2',
+        title: `Câu hỏi thường gặp về ${selectedKeyword}`,
+        isFaq: true,
+        items: [
+          { level: 'H3', title: `Thực hiện ${selectedKeyword} bao lâu một lần là phù hợp?` },
+          { level: 'H3', title: `Những lưu ý an toàn quan trọng nhất mẹ cần nhớ?` }
+        ]
+      },
+      {
+        level: 'H2',
+        title: `Lời nhắn gửi yêu thương và đồng hành cùng mẹ từ Home Care`,
+        isCta: true
+      }
+    ];
+  } else {
+    // Đảm bảo H1 ở vị trí đầu tiên
+    const hasH1 = rawList.some(item => (item.level || '').toUpperCase() === 'H1');
+    if (!hasH1) {
+      rawList.unshift({ level: 'H1', title: seoTitle });
+    }
+
+    // Đảm bảo Sapo ở vị trí thứ hai
+    const hasSapo = rawList.some(item => (item.level || '').toLowerCase() === 'sapo');
+    if (!hasSapo) {
+      rawList.splice(1, 0, {
+        level: 'Sapo',
+        guideline: `Đoạn 1: Thấu hiểu nỗi lo lắng của mẹ về **${selectedKeyword}**.\nĐoạn 2: Giải pháp thực tế và an toàn từ Home Care.`
+      });
+    }
+
+    // Đảm bảo có video embed ở ít nhất 1 H2
+    const hasVideo = rawList.some(item => item.hasVideoEmbed);
+    if (!hasVideo && rawList.length >= 3) {
+      const targetH2 = rawList.slice(2).find(item => (item.level || '').toUpperCase() === 'H2');
+      if (targetH2) targetH2.hasVideoEmbed = true;
+    }
+
+    // Đảm bảo có table ở ít nhất 1 H2
+    const hasTable = rawList.some(item => item.hasComparisonTable);
+    if (!hasTable && rawList.length >= 4) {
+      const targetH2 = rawList.slice(3).find(item => (item.level || '').toUpperCase() === 'H2' && !item.hasVideoEmbed);
+      if (targetH2) targetH2.hasComparisonTable = true;
+    }
+
+    // Đảm bảo có FAQ
+    const hasFaq = rawList.some(item => /câu hỏi thường gặp|faqs|faq/i.test(item.title || ''));
+    if (!hasFaq) {
+      rawList.push({
+        level: 'H2',
+        title: `Câu hỏi thường gặp về ${selectedKeyword}`,
+        isFaq: true,
+        items: [
+          { level: 'H3', title: `Thực hiện ${selectedKeyword} bao lâu một lần là phù hợp?` },
+          { level: 'H3', title: `Những lưu ý an toàn quan trọng nhất mẹ cần nhớ?` }
+        ]
+      });
+    }
+
+    // Đảm bảo có CTA
+    const hasCta = rawList.some(item => /lời nhắn gửi|tư vấn|đồng hành/i.test(item.title || ''));
+    if (!hasCta) {
+      rawList.push({
+        level: 'H2',
+        title: `Lời nhắn gửi yêu thương và đồng hành cùng mẹ từ Home Care`,
+        isCta: true
+      });
+    }
+  }
+
+  data.outline = rawList;
+  return data;
+}
+
 // 6. Bước 5: Tạo Content Brief & Lập Dàn Ý Outline (LLM Agent 3)
 app.post('/api/generate-outline', async (req, res) => {
   try {
@@ -138,31 +301,10 @@ app.post('/api/generate-outline', async (req, res) => {
 
     console.log(`[LLM Agent 3] Đang lập Dàn ý H1-H4 cho từ khóa: "${selectedKeyword}"...`);
     const prompt = buildGenerateOutlinePrompt(selectedKeyword, contentAnalysis, lsiKeywords || [], options || {});
-    const outlineData = await callGemini(prompt, { apiKey, model, isJson: true, maxTokens: 2800 });
+    let outlineData = await callGemini(prompt, { apiKey, model, isJson: true, maxTokens: 8192 });
 
-    // Đảm bảo dàn ý có ít nhất 4 H2, có FAQs và CTA
-    if (outlineData && Array.isArray(outlineData.outline)) {
-      const hasFaq = outlineData.outline.some(item => /câu hỏi thường gặp|faqs|faq/i.test(item.title || ''));
-      if (!hasFaq) {
-        outlineData.outline.push({
-          level: 'H2',
-          title: `Câu hỏi thường gặp về ${selectedKeyword}`,
-          isFaq: true,
-          items: [
-            { level: 'H3', title: `Thực hiện ${selectedKeyword} bao lâu một lần là phù hợp?` },
-            { level: 'H3', title: `Những lưu ý an toàn quan trọng nhất mẹ cần nhớ?` }
-          ]
-        });
-      }
-      const hasCta = outlineData.outline.some(item => /lời nhắn gửi|tư vấn|đồng hành/i.test(item.title || ''));
-      if (!hasCta) {
-        outlineData.outline.push({
-          level: 'H2',
-          title: `Lời nhắn gửi yêu thương và đồng hành cùng mẹ từ Home Care`,
-          isCta: true
-        });
-      }
-    }
+    // Chuẩn hóa và bảo đảm 100% không bao giờ thiếu Content Brief hoặc Dàn ý
+    outlineData = normalizeOutlineResponse(outlineData, selectedKeyword, contentAnalysis);
 
     res.json({ success: true, outlineData });
   } catch (err) {
