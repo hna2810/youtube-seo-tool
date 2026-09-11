@@ -7,7 +7,7 @@ const { getYouTubeData } = require('./services/youtubeService');
 const { callGemini, getApiKeyStatus, getAvailableOpenRouterModels } = require('./services/llmService');
 const { gradeSeoArticle } = require('./services/seoGraderService');
 const { generateDocxBuffer } = require('./services/docxExportService');
-const { parseArticleResponse, convertMarkdownToCleanHtml } = require('./services/articleParser');
+const { parseArticleResponse, autoOptimizeArticleForSeo, convertMarkdownToCleanHtml } = require('./services/articleParser');
 const { publishToWordPress } = require('./services/wordpressService');
 
 const { buildAnalyzeContentPrompt } = require('./prompts/analyzeContent');
@@ -129,6 +129,30 @@ app.post('/api/generate-outline', async (req, res) => {
     const prompt = buildGenerateOutlinePrompt(selectedKeyword, contentAnalysis, lsiKeywords || [], options || {});
     const outlineData = await callGemini(prompt, { apiKey, model, isJson: true, maxTokens: 2800 });
 
+    // Đảm bảo dàn ý có ít nhất 4 H2, có FAQs và CTA
+    if (outlineData && Array.isArray(outlineData.outline)) {
+      const hasFaq = outlineData.outline.some(item => /câu hỏi thường gặp|faqs|faq/i.test(item.title || ''));
+      if (!hasFaq) {
+        outlineData.outline.push({
+          level: 'H2',
+          title: `Câu hỏi thường gặp về ${selectedKeyword}`,
+          isFaq: true,
+          items: [
+            { level: 'H3', title: `Thực hiện ${selectedKeyword} bao lâu một lần là phù hợp?` },
+            { level: 'H3', title: `Những lưu ý an toàn quan trọng nhất mẹ cần nhớ?` }
+          ]
+        });
+      }
+      const hasCta = outlineData.outline.some(item => /lời nhắn gửi|tư vấn|đồng hành/i.test(item.title || ''));
+      if (!hasCta) {
+        outlineData.outline.push({
+          level: 'H2',
+          title: `Lời nhắn gửi yêu thương và đồng hành cùng mẹ từ Home Care`,
+          isCta: true
+        });
+      }
+    }
+
     res.json({ success: true, outlineData });
   } catch (err) {
     console.error('[LLM Agent 3 Error]:', err.message);
@@ -147,15 +171,38 @@ app.post('/api/write-article', async (req, res) => {
     console.log(`[LLM Agent 4] Đang viết bài SEO + Semantic + AEO cho từ khóa: "${selectedKeyword}"...`);
     const prompt = buildWriteArticlePrompt(approvedOutline, selectedKeyword, youtubeData, contentAnalysis, internalLinks || [], options || {});
     
-    // Gọi LLM ở dạng text mode (maxTokens 2000) để đảm bảo bài viết đầy đủ sâu sắc và vừa vặn in-flight token budget
-    const rawResponse = await callGemini(prompt, { apiKey, model, isJson: false, maxTokens: 2000, temperature: 0.7 });
+    // Tăng maxTokens lên 3500 để bài viết dài từ 1.200 - 1.800 từ trọn vẹn, không bị cắt cụt
+    const rawResponse = await callGemini(prompt, { apiKey, model, isJson: false, maxTokens: 3500, temperature: 0.7 });
     
-    // Parse an toàn tuyệt đối qua articleParser
-    const articleData = parseArticleResponse(rawResponse, selectedKeyword);
+    // Parse an toàn và tự động tối ưu hóa toàn diện đạt chuẩn 95 - 100 điểm
+    const articleData = parseArticleResponse(rawResponse, selectedKeyword, { youtubeData, internalLinks });
 
     res.json({ success: true, articleData });
   } catch (err) {
     console.error('[LLM Agent 4 Error]:', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 7.1 Endpoint 1-click tự động nâng cấp bài viết đạt 95 - 100 điểm SEO
+app.post('/api/auto-optimize', async (req, res) => {
+  try {
+    const { articleData, selectedKeyword, youtubeData, internalLinks } = req.body;
+    if (!articleData || !selectedKeyword) {
+      return res.status(400).json({ success: false, error: 'Thiếu dữ liệu bài viết để tối ưu' });
+    }
+
+    console.log(`[Auto-Optimizer] Đang tối ưu hóa nâng cấp bài viết lên 95 - 100 điểm cho từ khóa: "${selectedKeyword}"...`);
+    const optimized = autoOptimizeArticleForSeo(articleData, selectedKeyword, { youtubeData, internalLinks });
+    const seoReport = gradeSeoArticle(optimized, selectedKeyword);
+
+    res.json({
+      success: true,
+      articleData: optimized,
+      seoReport
+    });
+  } catch (err) {
+    console.error('[Auto-Optimizer Error]:', err.message);
     res.status(500).json({ success: false, error: err.message });
   }
 });

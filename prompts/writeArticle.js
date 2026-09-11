@@ -93,35 +93,52 @@ ${outlineDetailedList}
    - Ưu tiên thông tin thực tế, mẹ có thể áp dụng được ngay tại nhà.
    - Lời kêu gọi hành động (CTA) ở cuối bài tự nhiên, ngắn gọn, ấm áp.
 
-=== BỐ CỤC CHUẨN SEO BẮT BUỘC ===
-1. MỞ BÀI (SAPO) TỐI ĐA 2 ĐOẠN VĂN:
+=== BỐ CỤC CHUẨN SEO BẮT BUỘC (MỤC TIÊU 95 - 100 ĐIỂM) ===
+1. QUY ĐỊNH ĐỘ DÀI TOÀN BÀI (BẮT BUỘC 1.200 - 1.800 TỪ):
+   - Bài viết bắt buộc phải đạt độ dài từ 1.200 từ đến 1.800 từ (TUYỆT ĐỐI KHÔNG VIẾT TÓM TẮT DƯỚI 1.000 TỪ).
+   - Mỗi đề mục H2 và H3 phải được phân tích sâu sắc bằng ít nhất 2 đến 4 đoạn văn đầy đủ (mỗi đoạn 3 - 5 câu), đưa ra hướng dẫn cụ thể, giải thích cặn kẽ và các lưu ý an toàn cho mẹ.
+
+2. MỞ BÀI (SAPO) TỐI ĐA 2 ĐOẠN VĂN:
    - Thân bài BẮT ĐẦU TRỰC TIẾP từ đoạn Sapo (KHÔNG viết lại H1 vào thân bài).
    - Đoạn 1: Dòng 1 chứa ngay từ khóa chính **${selectedKeyword}** được in đậm. Xoáy thẳng vào nỗi đau, thắc mắc, tâm tư của mẹ.
    - Đoạn 2: Nêu giải pháp thực tế và giá trị đồng hành của bài viết, gợi mở mẹ đọc tiếp.
    - TUYỆT ĐỐI CẤM MỞ BÀI SÁO RỖNG ("Trong xã hội hiện đại...", "Như chúng ta đã biết...").
 
-2. TIÊU ĐỀ H2, H3, H4:
-   - Viết đầy đủ tất cả các đề mục H2, H3, H4 theo đúng thứ tự và cấp độ thẻ mà người dùng đã thiết lập trong dàn ý.
+3. KHỐI CHỈ ĐỊNH ẢNH BÌA (FEATURED IMAGE):
+   - Ngay sau đoạn mở bài Sapo (trước đề mục H2 đầu tiên), bắt buộc có khối mô tả ảnh bìa theo cú pháp:
+     > **[Ảnh bìa: Mô tả chi tiết hình ảnh chất lượng cao về ${selectedKeyword} phong cách tự nhiên, ấm áp của Home Care]**
+
+4. TIÊU ĐỀ H2, H3, H4:
+   - Viết đầy đủ tất cả các đề mục H2, H3, H4 theo đúng thứ tự và cấp độ thẻ mà người dùng đã thiết lập trong dàn ý (đảm bảo ít nhất 4 - 5 đề mục H2).
    - Chỉ viết hoa chữ cái đầu tiên (không dùng Title Case).
    - Tuyệt đối không dùng dấu hai chấm ":" trong tiêu đề.
    - Không đánh số thứ tự đầu đề mục ("1.", "1.1").
 
-3. BẢNG SO SÁNH / ĐỐI CHIẾU DỮ LIỆU:
-   - Bắt buộc tạo ít nhất 1 bảng Markdown Table đối chiếu số liệu, phân loại hoặc giải pháp, ưu tiên đặt tại đề mục có chỉ định.
+5. KHỐI ẢNH MINH HỌA TRONG BÀI (Ít nhất 2 khối):
+   - Đặt ít nhất 2 khối mô tả ảnh dưới các mục hướng dẫn thực hành theo cú pháp:
+     > **[Ảnh 1: Mô tả ảnh chụp thực tế rõ nét minh họa các bước ${selectedKeyword} cho mẹ]**
+     > **[Ảnh 2: Mô tả chuyên viên Home Care tận tâm hướng dẫn và chăm sóc mẹ tại nhà]**
 
-4. NHÚNG VIDEO YOUTUBE:
-   - Đặt đoạn mã embed YouTube (ở trên) vào đúng đề mục có yêu cầu chèn video kèm 1 câu chú thích: *Video hướng dẫn thực tế chi tiết về ${selectedKeyword}.*
+6. BẢNG SO SÁNH / ĐỐI CHIẾU DỮ LIỆU:
+   - Bắt buộc tạo ít nhất 1 bảng Markdown Table đối chiếu số liệu, phân loại hoặc tiêu chí giải pháp rõ ràng, khoa học.
 
-5. MÔ TẢ HÌNH ẢNH:
-   - Đặt các khối mô tả ảnh như \`[ảnh 1: Mô tả ảnh chụp thực tế rõ nét...]\` dưới các mục quy trình cần minh họa.
+7. NHÚNG VIDEO YOUTUBE:
+   - Đặt đoạn mã embed YouTube (ở trên) vào đúng đề mục có yêu cầu chèn video kèm 1 câu chú thích in nghiêng: *Video hướng dẫn thực tế chi tiết về ${selectedKeyword}.*
 
-6. MỤC FAQs:
-   - 3 - 5 câu hỏi đáp súc tích giải đáp những thắc mắc ba mẹ hay hỏi.
+8. LIÊN KẾT NỘI BỘ (INTERNAL LINKS):
+   - Chèn tự nhiên ít nhất 2 - 3 liên kết nội bộ trong thân bài dưới dạng Markdown [anchor text](url) hoặc HTML <a href="url">anchor text</a>.
 
-7. BỘ LỌC TỪ CẤM TUYỆT ĐỐI (AGENTS.MD):
+9. MỤC FAQs (BẮT BUỘC):
+   - Phải có đề mục H2: \`## Câu hỏi thường gặp về ${selectedKeyword}\` với 3 câu hỏi đáp súc tích giải đáp những thắc mắc ba mẹ hay hỏi.
+
+10. ĐOẠN KẾT VÀ LỜI KÊU GỌI HÀNH ĐỘNG (CTA BẮT BUỘC):
+   - Có đề mục kết thúc ấm áp chứa lời kêu gọi hành động (CTA) rõ ràng, lồng ghép thông tin liên hệ: hotline: **0976.088.002**, website: **chamsocmebe.vn** để mẹ liên hệ tư vấn và đặt lịch trải nghiệm.
+
+11. BỘ LỌC TỪ CẤM TUYỆT ĐỐI (AGENTS.MD):
    TUYỆT ĐỐI KHÔNG SỬ DỤNG các từ và cụm từ sau:
    ${bannedListStr}
    - Thay toàn bộ từ "thiên nhiên" bằng "tự nhiên".
+   - Không dùng "tuyệt đối", "đảm bảo", "chữa trị", "điều trị".
    - Hạn chế tối đa từ "nên".
 
 === ĐỊNH DẠNG ĐẦU RA BẮT BUỘC (SỬ DỤNG 2 THẺ XML) ===
@@ -130,9 +147,9 @@ Hãy trả về bài viết theo đúng cấu trúc 2 thẻ XML sau (không bao 
 <metadata>
 {
   "h1Title": "Tiêu đề bài viết thu hút chuẩn CTR không dấu hai chấm",
-  "metaTitle": "SEO Title dưới 60 ký tự",
-  "slug": "url-slug-chua-tu-khoa-khong-dau",
-  "metaDescription": "Meta description dưới 160 ký tự chứa từ khóa và lời nhắn ấm áp"
+  "metaTitle": "SEO Title ngắn gọn 50 đến 60 ký tự không dấu hai chấm chứa từ khóa chính",
+  "slug": "url-slug-chua-tu-khoa-khong-dau-duoi-55-ky-tu",
+  "metaDescription": "Meta description 140 đến 160 ký tự chứa từ khóa chính và lời nhắn ấm áp kèm CTA khám phá ngay"
 }
 </metadata>
 

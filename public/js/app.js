@@ -94,8 +94,11 @@ const el = {
   toolAddImage: document.getElementById('tool-add-image'),
   toolAddTable: document.getElementById('tool-add-table'),
   toolAddVideo: document.getElementById('tool-add-video'),
+  btnAutoOptimizeEditor: document.getElementById('btn-auto-optimize-editor'),
+  btnAutoOptimizeEditorAction: document.getElementById('btn-auto-optimize-editor-action'),
   btnRunSeoGrade: document.getElementById('btn-run-seo-grade'),
   // Step 5: SEO Score & Publish
+  btnAutoOptimizeReport: document.getElementById('btn-auto-optimize-report'),
   scoreVal: document.getElementById('score-number'),
   scoreGrade: document.getElementById('score-grade'),
   scoreBadge: document.getElementById('score-badge'),
@@ -624,8 +627,21 @@ function initEventListeners() {
 
   initEditorToolbar();
 
+  // BƯỚC 4: 1-Click Tự động tối ưu đạt 95 - 100 điểm SEO
+  if (el.btnAutoOptimizeEditor) {
+    el.btnAutoOptimizeEditor.addEventListener('click', handleAutoOptimizeArticle);
+  }
+  if (el.btnAutoOptimizeEditorAction) {
+    el.btnAutoOptimizeEditorAction.addEventListener('click', handleAutoOptimizeArticle);
+  }
+
   // BƯỚC 4 -> 5: Chấm điểm SEO bài viết đã biên tập
   el.btnRunSeoGrade.addEventListener('click', handleRunSeoGrade);
+
+  // BƯỚC 5: 1-Click Tự động tối ưu đạt 95 - 100 điểm trên báo cáo
+  if (el.btnAutoOptimizeReport) {
+    el.btnAutoOptimizeReport.addEventListener('click', handleAutoOptimizeArticle);
+  }
 
   // BƯỚC 5: Đẩy lên WordPress
   el.btnPushWordpress.addEventListener('click', handlePushToWordPress);
@@ -1757,6 +1773,60 @@ function htmlToMarkdown(rootNode) {
   md = md.replace(/\n{3,}/g, '\n\n').trim();
 
   return md;
+}
+
+// 1-Click Tự Động Tối Ưu Nâng Điểm Lên 95 - 100 Điểm SEO Toàn Diện
+async function handleAutoOptimizeArticle() {
+  if (!state.articleData || !state.selectedKeyword) return;
+
+  // Đồng bộ bài viết hiện tại từ Editor
+  syncVisualToMarkdown();
+  state.articleData.h1Title = el.editH1.value.trim();
+  state.articleData.metaTitle = el.editMetaTitle.value.trim();
+  state.articleData.slug = el.editSlug.value.trim();
+  state.articleData.metaDescription = el.editMetaDesc.value.trim();
+  state.articleData.contentMarkdown = el.editorMarkdown.value.trim();
+
+  try {
+    showLoading('Đang Tự Động Tối Ưu Lên 95 - 100 Điểm...', 'Hệ thống đang chuẩn hóa 16 tiêu chí, tối ưu độ dài >1.200 từ, cân bằng mật độ từ khóa, chèn ảnh minh họa, bảng đối chiếu và mục FAQs...');
+
+    const internalLinks = (state.customInternalLinks || []).filter(l => l.anchor && l.anchor.trim() && l.url && l.url.trim());
+    const res = await API.autoOptimize(
+      state.articleData,
+      state.selectedKeyword,
+      state.youtubeData,
+      internalLinks
+    );
+
+    if (res.success && res.articleData) {
+      state.articleData = res.articleData;
+      state.seoReport = res.seoReport;
+
+      // Cập nhật lại các trường trong Editor Bước 4
+      if (el.editH1) el.editH1.value = state.articleData.h1Title;
+      if (el.editMetaTitle) el.editMetaTitle.value = state.articleData.metaTitle;
+      if (el.editSlug) el.editSlug.value = state.articleData.slug;
+      if (el.editMetaDesc) el.editMetaDesc.value = state.articleData.metaDescription;
+      if (el.editorMarkdown) el.editorMarkdown.value = state.articleData.contentMarkdown;
+
+      if (el.editorVisual) {
+        el.editorVisual.innerHTML = markdownToSimpleHtml(state.articleData.contentMarkdown);
+        updateWordCount(el.editorVisual.innerText);
+      }
+
+      // Cập nhật giao diện báo cáo Bước 5 nếu đang ở Bước 5
+      if (state.currentStep === 5 && state.seoReport) {
+        renderFinalArticleAndSeoReport(state.articleData, state.seoReport);
+      }
+
+      alert(`🎉 Chúc mừng! Bài viết đã được tự động nâng cấp đạt ${res.seoReport.totalScore} / 100 điểm (${res.seoReport.grade} ${res.seoReport.badge})!`);
+    }
+  } catch (err) {
+    console.error('[Auto-Optimize Error]:', err);
+    alert(`Lỗi khi tự động tối ưu: ${err.message}`);
+  } finally {
+    hideLoading();
+  }
 }
 
 // BƯỚC 4 -> 5: Chạy Chấm Điểm SEO trên bài viết đã biên tập

@@ -127,6 +127,20 @@ const API = {
     return data;
   },
 
+  // 8.1 Tự động nâng cấp & tối ưu bài viết lên 95 - 100 điểm SEO
+  async autoOptimize(articleData, selectedKeyword, youtubeData, internalLinks) {
+    const res = await fetch('/api/auto-optimize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ articleData, selectedKeyword, youtubeData, internalLinks })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || 'Lỗi khi tự động tối ưu bài viết');
+    }
+    return data;
+  },
+
   // 9. Tải file Word .docx
   async downloadDocx(articleData, selectedKeyword) {
     const res = await fetch('/api/export-docx', {

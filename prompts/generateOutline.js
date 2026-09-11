@@ -54,12 +54,17 @@ Nhiệm vụ của bạn là phân tích và tự động lập Bản Content Br
    - Đoạn 2: Nêu giải pháp và giá trị thiết thực bài viết mang lại.
    - CẤM VĂN MẪU SÁO RỖNG ("Trong xã hội hiện đại...", "Như chúng ta đã biết...", "Nhu cầu tìm hiểu...").
 
-3. CẤU TRÚC HEADING H2, H3, H4:
+3. CẤU TRÚC HEADING H2, H3, H4 (BẮT BUỘC 4 ĐẾN 6 ĐỀ MỤC H2):
+   - BẮT BUỘC DÀN Ý PHẢI CÓ TỪ 4 ĐẾN 6 ĐỀ MỤC H2 CHUYÊN SÂU:
+     * H2 thứ nhất: Thấu hiểu nỗi băn khoăn, nguyên nhân hoặc lợi ích cốt lõi cho mẹ.
+     * H2 thứ hai: Hướng dẫn chi tiết từng bước thực hành an toàn (kèm chỉ định chèn Video YouTube).
+     * H2 thứ ba: Bảng so sánh đối chiếu / Các sai lầm phổ biến cần tránh.
+     * H2 thứ tư: "Câu hỏi thường gặp về ${selectedKeyword}" (Mục FAQs giải đáp thắc mắc).
+     * H2 thứ năm: "Lời nhắn gửi yêu thương và tư vấn từ Home Care" (Mục CTA).
    - Đâm thẳng vào ý định tìm kiếm (Search Intent).
    - Chỉ viết hoa chữ cái đầu tiên, không chứa dấu hai chấm ":".
    - Chỉ định rõ vị trí chèn Video YouTube (nhúng dạng responsive iframe kèm chú thích).
    - Bắt buộc có vị trí chỉ định chèn Bảng so sánh / tổng hợp dữ liệu (tối ưu AI Search & GEO).
-   - Có mục FAQs (Hỏi đáp nhanh) giải đáp thắc mắc thường gặp của ba mẹ.
    - Gợi ý vị trí các khối mô tả ảnh [ảnh 1: ...], [ảnh 2: ...].
    - Kết bài và lời kêu gọi hành động (CTA) nhẹ nhàng, tinh tế đồng hành cùng mẹ từ Home Care.
 

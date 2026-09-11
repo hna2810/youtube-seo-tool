@@ -354,6 +354,7 @@
                 <button type="button" class="btn-tool btn-tool-action" id="tool-add-table">📊 Thêm Bảng</button>
                 <button type="button" class="btn-tool btn-tool-action" id="tool-add-image">📷 Thêm Ảnh</button>
                 <button type="button" class="btn-tool btn-tool-action" id="tool-add-video">🎬 Chèn Lại Video</button>
+                <button type="button" class="btn-tool btn-tool-action" id="btn-auto-optimize-editor" style="background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; font-weight: 600; padding: 6px 12px; border-radius: 6px;" title="Tự động kiểm tra và nâng cấp bài viết đạt 95 - 100 điểm SEO">✨ Tự Động Tối Ưu (95-100đ)</button>
               </div>
             </div>
             <div class="toolbar-right">
@@ -387,10 +388,15 @@
 
           <div class="action-bar between mt-4">
             <button class="btn btn-secondary btn-prev" data-target="3">⬅ Quay Lại Dàn Ý</button>
-            <button id="btn-run-seo-grade" class="btn btn-primary btn-lg">
-              <span class="btn-text">🔍 Chấm Điểm SEO & Kiểm Định Chất Lượng ➔</span>
-              <span class="btn-spinner hidden"></span>
-            </button>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+              <button type="button" id="btn-auto-optimize-editor-action" class="btn btn-success" style="font-weight: 600; background: linear-gradient(135deg, #10b981, #059669); border: none; color: white;">
+                ✨ Tự Động Tối Ưu Lên 95 - 100 Điểm
+              </button>
+              <button id="btn-run-seo-grade" class="btn btn-primary btn-lg">
+                <span class="btn-text">🔍 Chấm Điểm SEO & Kiểm Định Chất Lượng ➔</span>
+                <span class="btn-spinner hidden"></span>
+              </button>
+            </div>
           </div>
 
         </div>
@@ -416,6 +422,11 @@
               <div class="score-info">
                 <h3>Xếp Loại Bài Viết: <span id="score-grade">...</span> <span id="score-badge">🟢</span></h3>
                 <p id="score-kw-stats" class="text-muted">Mật độ từ khóa chính: 0% | Độ dài: 0 từ</p>
+                <div id="auto-optimize-report-box" style="margin: 10px 0;">
+                  <button type="button" id="btn-auto-optimize-report" class="btn btn-success" style="font-weight: 600; padding: 8px 16px; border-radius: 8px; background: linear-gradient(135deg, #10b981, #059669); border: none; color: white; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
+                    ⚡ 1-Click Tự Động Nâng Cấp Bài Viết Lên 95 - 100 Điểm
+                  </button>
+                </div>
                 <div id="score-alerts-area" class="score-alerts"></div>
               </div>
             </div>
