@@ -17,8 +17,8 @@ Bộ mã nguồn này là ứng dụng Node.js hoàn chỉnh (Backend Express + 
    - Bấm **Create**.
 4. **Cài đặt Dependencies**:
    - Trong bảng điều khiển Node.js App, bấm nút **Run NPM Install** (hoặc mở Terminal gõ `npm install --production`).
-5. **Cấu hình API Key**:
-   - Mở file `openrouter.yaml` và điền API Key, hoặc thêm biến môi trường `OPENROUTER_API_KEY` trong mục Environment Variables.
+5. **Nhập API Key trực tiếp trên Web**:
+   - Người dùng truy cập website và tự nhập OpenRouter API Key của chính họ trên giao diện (lưu trong localStorage của từng trình duyệt, bảo mật riêng tư, không cần lưu trên server và không lo bị người khác dùng hao phí số dư).
 6. **Khởi động App**: Bấm **Restart** ứng dụng trên cPanel.
 
 ---

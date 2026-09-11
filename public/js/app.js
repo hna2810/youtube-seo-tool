@@ -153,7 +153,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // 1. Cài đặt API Keys & WP Settings ban đầu
 function initSavedSettings() {
-  if (state.apiKey) el.openrouterKey.value = state.apiKey;
+  if (state.apiKey) {
+    el.openrouterKey.value = state.apiKey;
+  } else {
+    // Nếu chưa có API Key, mở sẵn panel cài đặt để người dùng nhập
+    if (el.apiSettingsBody) {
+      el.apiSettingsBody.classList.add('show');
+    }
+  }
+
   const savedModel = localStorage.getItem('openrouter_model');
   if (!savedModel || savedModel === 'google/gemini-2.5-flash' || savedModel === 'deepseek/deepseek-chat') {
     state.model = 'openai/gpt-4o-mini';
@@ -168,9 +176,15 @@ function initSavedSettings() {
   if (state.wpUrl) el.wpUrl.value = state.wpUrl;
   if (state.wpUser) el.wpUser.value = state.wpUser;
 
-  el.openrouterKey.addEventListener('change', () => {
+  const handleKeyUpdate = () => {
     state.apiKey = el.openrouterKey.value.trim();
     localStorage.setItem('openrouter_api_key', state.apiKey);
+    updateApiStatusBadgeModel();
+  };
+
+  el.openrouterKey.addEventListener('input', handleKeyUpdate);
+  el.openrouterKey.addEventListener('change', () => {
+    handleKeyUpdate();
     checkServerStatus();
     loadOpenRouterModels();
   });
@@ -227,14 +241,17 @@ function highlightActiveModelTag(modelId) {
 }
 
 function updateApiStatusBadgeModel() {
-  const shortName = (state.model || '').split('/')[1] || state.model || 'Gemini 2.5';
+  const shortName = (state.model || '').split('/')[1] || state.model || 'OpenRouter';
   if (el.headerModelName) {
     el.headerModelName.textContent = `Model: ${shortName}`;
   }
   if (el.apiStatusBadge) {
-    if (state.apiKey || el.apiStatusBadge.classList.contains('badge-success')) {
+    if (state.apiKey) {
       el.apiStatusBadge.className = 'badge badge-success';
-      el.apiStatusBadge.textContent = `🟢 OpenRouter (${shortName})`;
+      el.apiStatusBadge.textContent = `🟢 Key OK (${shortName})`;
+    } else {
+      el.apiStatusBadge.className = 'badge badge-warning';
+      el.apiStatusBadge.textContent = '🟡 Cần nhập OpenRouter API Key';
     }
   }
 }
@@ -404,7 +421,7 @@ async function loadOpenRouterModels() {
 // 2. Kiểm tra trạng thái Server
 async function checkServerStatus() {
   try {
-    const res = await API.getConfigStatus();
+    const res = await API.getConfigStatus(state.apiKey);
     if (res.success && res.llmStatus) {
       if (res.llmStatus.configuredModel && !localStorage.getItem('openrouter_model')) {
         state.model = res.llmStatus.configuredModel;
@@ -414,10 +431,7 @@ async function checkServerStatus() {
       const shortName = (state.model || '').split('/')[1] || state.model || 'OpenRouter';
       if (state.apiKey) {
         el.apiStatusBadge.className = 'badge badge-success';
-        el.apiStatusBadge.textContent = `🟢 OpenRouter (${shortName})`;
-      } else if (res.llmStatus.hasKey) {
-        el.apiStatusBadge.className = 'badge badge-success';
-        el.apiStatusBadge.textContent = `🟢 OpenRouter (${shortName})`;
+        el.apiStatusBadge.textContent = `🟢 Key OK (${shortName})`;
       } else {
         el.apiStatusBadge.className = 'badge badge-warning';
         el.apiStatusBadge.textContent = '🟡 Cần nhập OpenRouter API Key';
@@ -801,6 +815,14 @@ async function handleFetchYouTubeData() {
 async function handleAnalyzeAndSuggestKeywords() {
   if (!state.youtubeData) return;
 
+  state.apiKey = el.openrouterKey.value.trim();
+  if (!state.apiKey) {
+    alert('Vui lòng nhập OpenRouter API Key (sk-or-v1-...) trong mục "⚙️ Cài đặt OpenRouter API Key & Model AI" bên trên để bắt đầu phân tích AI!');
+    if (el.apiSettingsBody) el.apiSettingsBody.classList.add('show');
+    if (el.openrouterKey) el.openrouterKey.focus();
+    return;
+  }
+
   if (el.transcriptText.value.trim()) {
     state.youtubeData.transcript.fullText = el.transcriptText.value.trim();
   }
@@ -954,6 +976,14 @@ function normalizeOutlineList(rawOutline) {
 
 // BƯỚC 2 -> 3: Tạo Dàn ý Outline
 async function handleCreateOutline() {
+  state.apiKey = el.openrouterKey.value.trim();
+  if (!state.apiKey) {
+    alert('Vui lòng nhập OpenRouter API Key (sk-or-v1-...) trong mục Cài đặt để tạo Dàn ý bằng AI!');
+    if (el.apiSettingsBody) el.apiSettingsBody.classList.add('show');
+    if (el.openrouterKey) el.openrouterKey.focus();
+    return;
+  }
+
   const finalKeyword = el.customKeyword.value.trim() || state.selectedKeyword;
   if (!finalKeyword) {
     alert('Vui lòng chọn hoặc nhập một từ khóa SEO chính!');
@@ -1399,6 +1429,14 @@ function handleOutlineContainerChange(e) {
 // BƯỚC 3 -> 4: Agent 4 Viết Bài -> Mở màn hình Biên Tập (Editor)
 async function handleWriteArticle() {
   if (!state.outlineData || !state.selectedKeyword) return;
+
+  state.apiKey = el.openrouterKey.value.trim();
+  if (!state.apiKey) {
+    alert('Vui lòng nhập OpenRouter API Key (sk-or-v1-...) trong mục Cài đặt để AI viết bài hoàn chỉnh!');
+    if (el.apiSettingsBody) el.apiSettingsBody.classList.add('show');
+    if (el.openrouterKey) el.openrouterKey.focus();
+    return;
+  }
 
   const internalLinks = (state.customInternalLinks || []).filter(l => l.anchor && l.anchor.trim() && l.url && l.url.trim());
   const options = {};

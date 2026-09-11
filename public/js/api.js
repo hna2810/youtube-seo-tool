@@ -20,8 +20,9 @@ const API = {
   },
 
   // 1. Kiểm tra cấu hình Server
-  async getConfigStatus() {
-    const res = await fetch('/api/config-status');
+  async getConfigStatus(apiKey = '') {
+    const url = apiKey ? `/api/config-status?apiKey=${encodeURIComponent(apiKey)}` : '/api/config-status';
+    const res = await fetch(url);
     return await res.json();
   },
 

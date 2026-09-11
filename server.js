@@ -27,7 +27,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // 1. Kiểm tra trạng thái cấu hình Server
 app.get('/api/config-status', (req, res) => {
   try {
-    const status = getApiKeyStatus();
+    const customKey = req.query.apiKey || null;
+    const status = getApiKeyStatus(customKey);
     res.json({
       success: true,
       llmStatus: status,
@@ -63,27 +64,30 @@ app.get('/api/default-links', (req, res) => {
   }
 });
 
-// 3. Bước 1 & 2: Thu thập Dữ liệu YouTube (Metadata & Transcript)
+// 3. Bước 1: Thu thập Dữ liệu YouTube
 app.post('/api/extract-youtube', async (req, res) => {
   try {
     const { url, youtubeApiKey } = req.body;
     if (!url) {
-      return res.status(400).json({ success: false, error: 'Vui lòng cung cấp link YouTube!' });
+      return res.status(400).json({ success: false, error: 'Thiếu đường dẫn URL YouTube' });
     }
 
-    console.log(`[YouTube] Đang xử lý URL: ${url}`);
+    console.log(`[YouTube Service] Đang trích xuất dữ liệu từ video: ${url}...`);
     const data = await getYouTubeData(url, youtubeApiKey);
     res.json({ success: true, data });
   } catch (err) {
-    console.error('[YouTube Error]:', err.message);
+    console.error('[YouTube Service Error]:', err.message);
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// 4. Bước 3: Phân tích Nội dung (LLM Agent 1)
+// 4. Bước 2 & 3: Phân tích Nội dung & Thực thể Semantic (LLM Agent 1)
 app.post('/api/analyze-content', async (req, res) => {
   try {
     const { metadata, transcript, apiKey, model } = req.body;
+    if (!apiKey || !apiKey.trim()) {
+      return res.status(400).json({ success: false, error: 'Vui lòng nhập OpenRouter API Key (sk-or-v1-...) trên giao diện để tiếp tục!' });
+    }
     if (!metadata || !transcript) {
       return res.status(400).json({ success: false, error: 'Thiếu thông tin metadata hoặc transcript' });
     }
@@ -103,6 +107,9 @@ app.post('/api/analyze-content', async (req, res) => {
 app.post('/api/suggest-keywords', async (req, res) => {
   try {
     const { contentAnalysis, metadata, apiKey, model } = req.body;
+    if (!apiKey || !apiKey.trim()) {
+      return res.status(400).json({ success: false, error: 'Vui lòng nhập OpenRouter API Key (sk-or-v1-...) trên giao diện để tiếp tục!' });
+    }
     if (!contentAnalysis) {
       return res.status(400).json({ success: false, error: 'Thiếu dữ liệu phân tích nội dung' });
     }
@@ -122,6 +129,9 @@ app.post('/api/suggest-keywords', async (req, res) => {
 app.post('/api/generate-outline', async (req, res) => {
   try {
     const { selectedKeyword, contentAnalysis, lsiKeywords, options, apiKey, model } = req.body;
+    if (!apiKey || !apiKey.trim()) {
+      return res.status(400).json({ success: false, error: 'Vui lòng nhập OpenRouter API Key (sk-or-v1-...) trên giao diện để tiếp tục!' });
+    }
     if (!selectedKeyword || !contentAnalysis) {
       return res.status(400).json({ success: false, error: 'Thiếu từ khóa chính hoặc dữ liệu phân tích' });
     }
@@ -165,6 +175,9 @@ app.post('/api/generate-outline', async (req, res) => {
 app.post('/api/write-article', async (req, res) => {
   try {
     const { approvedOutline, selectedKeyword, youtubeData, contentAnalysis, internalLinks, options, apiKey, model } = req.body;
+    if (!apiKey || !apiKey.trim()) {
+      return res.status(400).json({ success: false, error: 'Vui lòng nhập OpenRouter API Key (sk-or-v1-...) trên giao diện để tiếp tục!' });
+    }
     if (!approvedOutline || !selectedKeyword || !youtubeData) {
       return res.status(400).json({ success: false, error: 'Thiếu thông tin dàn ý hoặc dữ liệu video' });
     }

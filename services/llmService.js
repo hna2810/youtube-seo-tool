@@ -60,31 +60,29 @@ function getDefaultApiKey() {
 }
 
 /**
- * Kiểm tra trạng thái API key để thông báo cho UI
+ * Kiểm tra trạng thái API key để thông báo cho UI (Ưu tiên key người dùng nhập trên giao diện)
  */
 function getApiKeyStatus(customKey = null) {
-  const active = customKey ? { key: customKey.trim(), model: null, provider: detectProvider(customKey) } : getDefaultApiKey();
-
-  if (!active.key) {
+  if (customKey && customKey.trim()) {
+    const key = customKey.trim();
+    const masked = key.length > 8 
+      ? `${key.substring(0, 7)}...${key.substring(key.length - 4)}` 
+      : '****';
     return {
-      hasKey: false,
-      maskedKey: null,
-      provider: 'none',
-      source: 'none',
-      configuredModel: 'deepseek/deepseek-chat'
+      hasKey: true,
+      maskedKey: masked,
+      provider: detectProvider(key),
+      source: 'user_provided',
+      configuredModel: 'openai/gpt-4o-mini'
     };
   }
 
-  const masked = active.key.length > 8 
-    ? `${active.key.substring(0, 7)}...${active.key.substring(active.key.length - 4)}` 
-    : '****';
-
   return {
-    hasKey: true,
-    maskedKey: masked,
-    provider: active.provider,
-    source: customKey ? 'user_provided' : 'server_default',
-    configuredModel: active.model || 'openai/gpt-4o-mini'
+    hasKey: false,
+    maskedKey: null,
+    provider: 'none',
+    source: 'none',
+    configuredModel: 'openai/gpt-4o-mini'
   };
 }
 
@@ -641,7 +639,7 @@ async function callGeminiDirect(apiKey, prompt, options = {}) {
 }
 
 /**
- * Hàm LLM trung tâm - Ưu tiên OpenRouter
+ * Hàm LLM trung tâm - Ưu tiên API Key người dùng nhập trực tiếp trên giao diện
  */
 async function callGemini(prompt, options = {}) {
   let activeKey = options.apiKey && options.apiKey.trim();
@@ -649,14 +647,14 @@ async function callGemini(prompt, options = {}) {
 
   if (activeKey) {
     provider = detectProvider(activeKey);
-  } else {
+  } else if (options.allowServerFallback) {
     const def = getDefaultApiKey();
     activeKey = def.key;
     provider = def.provider;
   }
 
   if (!activeKey) {
-    throw new Error('Chưa cấu hình OpenRouter API Key. Vui lòng nhập API Key (sk-or-v1-...) trên giao diện hoặc lưu vào openrouter.yaml!');
+    throw new Error('Vui lòng nhập OpenRouter API Key (sk-or-v1-...) của bạn trên giao diện để sử dụng! (Hệ thống yêu cầu mỗi người dùng sử dụng API Key riêng của mình).');
   }
 
   console.log(`[LLM Caller] Đang gọi qua Provider: ${provider.toUpperCase()} (Model: ${options.model || 'default'})`);
