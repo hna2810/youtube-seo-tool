@@ -5,7 +5,7 @@
 // Application State
 const state = {
   apiKey: localStorage.getItem('gemini_api_key') || localStorage.getItem('openrouter_api_key') || '',
-  model: localStorage.getItem('openrouter_model') || 'gemini-2.5-flash',
+  model: localStorage.getItem('openrouter_model') || 'gemini-flash-latest',
   ytApiKey: localStorage.getItem('yt_api_key') || '',
   wpUrl: localStorage.getItem('wp_site_url') || '',
   wpApiKey: localStorage.getItem('wp_api_key') || '',
@@ -172,11 +172,11 @@ function initSavedSettings() {
   const keyProv = detectProviderFrontend(state.apiKey);
   const savedModel = localStorage.getItem('openrouter_model');
   if (!savedModel) {
-    state.model = (keyProv === 'OpenRouter') ? 'openai/gpt-4o-mini' : 'gemini-2.5-flash';
+    state.model = (keyProv === 'OpenRouter') ? 'openai/gpt-4o-mini' : 'gemini-flash-latest';
     localStorage.setItem('openrouter_model', state.model);
-  } else if (keyProv === 'Gemini' && (savedModel.includes('/') || !savedModel.startsWith('gemini'))) {
-    // Nếu key là Gemini nhưng model trước đó là OpenRouter, chuyển sang Gemini 2.5 Flash
-    state.model = 'gemini-2.5-flash';
+  } else if (keyProv === 'Gemini' && (savedModel.includes('/') || !savedModel.startsWith('gemini') || savedModel === 'gemini-2.5-flash')) {
+    // Tự động chuyển sang gemini-flash-latest để tránh tình trạng Spikes in demand
+    state.model = 'gemini-flash-latest';
     localStorage.setItem('openrouter_model', state.model);
   } else {
     state.model = savedModel;
@@ -196,7 +196,7 @@ function initSavedSettings() {
 
     const prov = detectProviderFrontend(state.apiKey);
     if (prov === 'Gemini' && (state.model.includes('/') || !state.model.startsWith('gemini'))) {
-      state.model = 'gemini-2.5-flash';
+      state.model = 'gemini-flash-latest';
       localStorage.setItem('openrouter_model', state.model);
       if (el.openrouterModel) el.openrouterModel.value = state.model;
       highlightActiveModelTag(state.model);
@@ -312,11 +312,13 @@ function showModelErrorModal({ error, retryAction, stepTitle }) {
   // Diễn giải lỗi thân thiện, chỉ rõ cách khắc phục
   let cleanMsg = error || 'Lỗi không xác định từ OpenRouter';
   if (cleanMsg.includes('402') || cleanMsg.toLowerCase().includes('credit') || cleanMsg.toLowerCase().includes('afford')) {
-    cleanMsg = `<strong>Lỗi Hạn Mức / Hết Credit (402):</strong> Model hiện tại yêu cầu thêm credit hoặc tài khoản của bạn tạm thời hết số dư.<br><br><span style="color:#15803d;font-weight:600;">👉 Mẹo: Hãy bấm chọn <strong>✨ Auto Free (Miễn phí)</strong> hoặc <strong>DeepSeek V3</strong> bên dưới rồi nhấn Thử Lại Ngay để tạo bài viết mà không mất phí!</span>`;
+    cleanMsg = `<strong>Lỗi Hạn Mức / Hết Credit (402):</strong> Model hiện tại yêu cầu thêm credit hoặc tài khoản của bạn tạm thời hết số dư.<br><br><span style="color:#15803d;font-weight:600;">👉 Mẹo: Hãy bấm chọn <strong>⚡ Gemini Flash Mới Nhất</strong> hoặc <strong>✨ Auto Free (Miễn phí)</strong> bên dưới rồi nhấn Thử Lại Ngay!</span>`;
+  } else if (/high demand|spikes in demand|overloaded|503/i.test(cleanMsg)) {
+    cleanMsg = `<strong>Google Gemini Đang Quá Tải Tạm Thời (High Demand):</strong> Model hiện tại đang có lượng truy cập tăng đột biến từ Google.<br><br><span style="color:#15803d;font-weight:600;">👉 Mẹo: Hãy bấm chọn <strong>⚡ Gemini Flash Mới Nhất</strong> hoặc <strong>🚀 Gemini 3.5 Flash</strong> bên dưới rồi nhấn <strong>"Đổi Model & Thử Lại Ngay"</strong> để tiếp tục mượt mà!</span>`;
   } else if (cleanMsg.includes('429') || cleanMsg.toLowerCase().includes('rate limit')) {
     cleanMsg = `<strong>Lỗi Quá Tải / Giới Hạn Tần Suất (429):</strong> Model đang bị quá tải hoặc đạt giới hạn số lượt gọi mỗi phút. Hãy chọn model khác hoặc model Auto Free.`;
   } else if (cleanMsg.toLowerCase().includes('timeout') || cleanMsg.includes('504')) {
-    cleanMsg = `<strong>Lỗi Hết Thời Gian Chờ (Timeout):</strong> Model phản hồi quá lâu. Bạn có thể chọn model có tốc độ phản hồi nhanh như <strong>Gemini 2.5 Flash</strong> hoặc <strong>Auto Free</strong>.`;
+    cleanMsg = `<strong>Lỗi Hết Thời Gian Chờ (Timeout):</strong> Model phản hồi quá lâu. Bạn có thể chọn model có tốc độ phản hồi nhanh như <strong>Gemini Flash Mới Nhất</strong> hoặc <strong>Auto Free</strong>.`;
   }
 
   if (el.errorModalMessage) {

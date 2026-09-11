@@ -98,11 +98,11 @@
                     <label for="openrouter-model" class="form-label" style="margin-bottom: 0;">Model AI <span class="required">*</span></label>
                     <span id="model-count-badge" class="model-badge">Gemini 2.5 Flash</span>
                   </div>
-                  <input type="text" id="openrouter-model" list="model-datalist" class="form-control" placeholder="Gõ tìm hoặc nhập Model ID..." value="gemini-2.5-flash" autocomplete="off" />
+                  <input type="text" id="openrouter-model" list="model-datalist" class="form-control" placeholder="Gõ tìm hoặc nhập Model ID..." value="gemini-flash-latest" autocomplete="off" />
                   <datalist id="model-datalist">
-                    <option value="gemini-2.5-flash">⚡ Google Gemini 2.5 Flash (Siêu tốc ~2s, Dồi dào Token nhất - Khuyên dùng)</option>
-                    <option value="gemini-2.5-pro">💎 Google Gemini 2.5 Pro (Tư duy sâu sắc, Viết bài chuyên sâu)</option>
-                    <option value="gemini-3.6-flash">🚀 Google Gemini 3.6 Flash (Bản mới nhất)</option>
+                    <option value="gemini-flash-latest">⚡ Google Gemini Flash Mới Nhất (Tự cân bằng tải, Ổn định nhất - Khuyên dùng)</option>
+                    <option value="gemini-3.5-flash">🚀 Google Gemini 3.5 Flash (Siêu tốc, Không lo quá tải)</option>
+                    <option value="gemini-2.5-flash">⚡ Google Gemini 2.5 Flash (Dồi dào Token)</option>
                     <option value="openai/gpt-4o-mini">⚡ OpenAI: GPT-4o Mini (OpenRouter - Siêu tốc)</option>
                     <option value="deepseek/deepseek-chat">DeepSeek: DeepSeek V3 (OpenRouter)</option>
                     <option value="openrouter/free">✨ OpenRouter Auto Free (100% Miễn phí)</option>
@@ -110,8 +110,9 @@
                   </datalist>
                   <div class="model-quick-tags" id="model-quick-tags">
                     <span class="quick-tags-title">Gợi ý nhanh:</span>
-                    <button type="button" class="btn-model-tag active" data-model="gemini-2.5-flash" style="background:#e8f0fe;border-color:#1a73e8;color:#1a73e8;font-weight:700;">⚡ Gemini 2.5 Flash (Dồi dào Token)</button>
-                    <button type="button" class="btn-model-tag" data-model="gemini-2.5-pro" style="background:#f3e8fd;border-color:#9333ea;color:#7e22ce;font-weight:700;">💎 Gemini 2.5 Pro</button>
+                    <button type="button" class="btn-model-tag active" data-model="gemini-flash-latest" style="background:#e8f0fe;border-color:#1a73e8;color:#1a73e8;font-weight:700;">⚡ Gemini Flash Mới Nhất (Ổn định nhất)</button>
+                    <button type="button" class="btn-model-tag" data-model="gemini-3.5-flash" style="background:#f3e8fd;border-color:#9333ea;color:#7e22ce;font-weight:700;">🚀 Gemini 3.5 Flash</button>
+                    <button type="button" class="btn-model-tag" data-model="gemini-2.5-flash">Gemini 2.5 Flash</button>
                     <button type="button" class="btn-model-tag" data-model="openai/gpt-4o-mini">⚡ GPT-4o Mini</button>
                     <button type="button" class="btn-model-tag" data-model="openrouter/free" style="background:#e6f4ea;border-color:#137333;color:#137333;font-weight:700;">✨ Auto Free</button>
                   </div>
@@ -582,8 +583,9 @@
           <input type="text" id="modal-retry-model" list="model-datalist" class="form-control" placeholder="Gõ tìm hoặc chọn model từ danh sách..." autocomplete="off" />
           <div class="model-quick-tags mt-2" id="modal-retry-quick-tags">
             <span class="quick-tags-title">Gợi ý nhanh:</span>
-            <button type="button" class="btn-model-tag active" data-model="gemini-2.5-flash" style="background:#e8f0fe;border-color:#1a73e8;color:#1a73e8;font-weight:700;">⚡ Gemini 2.5 Flash (Dồi dào Token)</button>
-            <button type="button" class="btn-model-tag" data-model="gemini-2.5-pro" style="background:#f3e8fd;border-color:#9333ea;color:#7e22ce;font-weight:700;">💎 Gemini 2.5 Pro</button>
+            <button type="button" class="btn-model-tag active" data-model="gemini-flash-latest" style="background:#e8f0fe;border-color:#1a73e8;color:#1a73e8;font-weight:700;">⚡ Gemini Flash Mới Nhất (Ổn định)</button>
+            <button type="button" class="btn-model-tag" data-model="gemini-3.5-flash" style="background:#f3e8fd;border-color:#9333ea;color:#7e22ce;font-weight:700;">🚀 Gemini 3.5 Flash</button>
+            <button type="button" class="btn-model-tag" data-model="gemini-2.5-flash">Gemini 2.5 Flash</button>
             <button type="button" class="btn-model-tag" data-model="openai/gpt-4o-mini">⚡ GPT-4o Mini</button>
             <button type="button" class="btn-model-tag" data-model="deepseek/deepseek-chat">DeepSeek V3</button>
             <button type="button" class="btn-model-tag" data-model="openrouter/free" style="background:#e6f4ea;border-color:#137333;color:#137333;font-weight:700;">✨ Auto Free (Miễn phí)</button>

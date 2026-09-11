@@ -408,10 +408,10 @@ let lastFetchTime = 0;
 async function getAvailableOpenRouterModels(apiKey = null) {
   if (apiKey && detectProvider(apiKey) === 'gemini') {
     return [
-      { id: 'gemini-2.5-flash', name: '⚡ Google: Gemini 2.5 Flash (Dồi dào Token nhất - Khuyên dùng)', isPopular: true, isFree: true },
-      { id: 'gemini-2.5-pro', name: '💎 Google: Gemini 2.5 Pro (Tư duy sâu sắc & Viết chuyên sâu)', isPopular: true },
-      { id: 'gemini-3.6-flash', name: '🚀 Google: Gemini 3.6 Flash (Thế hệ mới)', isPopular: true },
-      { id: 'gemini-flash-latest', name: 'Google: Gemini Flash Latest', isPopular: false }
+      { id: 'gemini-flash-latest', name: '⚡ Google: Gemini Flash Mới Nhất (Tự cân bằng tải, Ổn định nhất - Khuyên dùng)', isPopular: true, isFree: true },
+      { id: 'gemini-3.5-flash', name: '🚀 Google: Gemini 3.5 Flash (Siêu tốc, Rất ít khi bận)', isPopular: true, isFree: true },
+      { id: 'gemini-2.5-flash', name: '⚡ Google: Gemini 2.5 Flash (Dồi dào Token)', isPopular: true, isFree: true },
+      { id: 'gemini-3.6-flash', name: '✨ Google: Gemini 3.6 Flash', isPopular: false }
     ];
   }
 
@@ -614,57 +614,95 @@ async function callOpenRouter(apiKey, prompt, options = {}) {
  * Gọi Gemini Trực Tiếp (Fallback nếu key là Google Gemini)
  */
 async function callGeminiDirect(apiKey, prompt, options = {}) {
-  let model = options.model || 'gemini-2.5-flash';
+  let initialModel = options.model || 'gemini-flash-latest';
   // Chuẩn hóa tên model sang Google Gemini nếu truyền nhầm model OpenRouter
-  if (model.includes('/') || !model.startsWith('gemini')) {
-    model = 'gemini-2.5-flash';
-  }
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-
-  const payload = {
-    contents: [{ parts: [{ text: prompt }] }],
-    generationConfig: {
-      temperature: options.temperature !== undefined ? options.temperature : 0.7,
-      maxOutputTokens: options.maxTokens || 8192
-    },
-    safetySettings: [
-      { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
-      { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
-      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
-      { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
-    ]
-  };
-
-  if (options.isJson) {
-    payload.generationConfig.responseMimeType = 'application/json';
+  if (initialModel.includes('/') || !initialModel.startsWith('gemini')) {
+    initialModel = 'gemini-flash-latest';
   }
 
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
+  // Danh sách cascade tự động chuyển đổi nếu model ban đầu gặp lỗi quá tải tạm thời (High Demand/503/429)
+  const candidateModels = [
+    initialModel,
+    'gemini-flash-latest',
+    'gemini-3.5-flash',
+    'gemini-2.5-flash'
+  ];
+  const modelsToTry = [...new Set(candidateModels)];
 
-  if (!res.ok) {
-    const errBody = await res.text();
-    let msg = `Gemini API Error (${res.status}): ${errBody}`;
+  let lastError = null;
+
+  for (let i = 0; i < modelsToTry.length; i++) {
+    const currentModel = modelsToTry[i];
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${apiKey}`;
+
+    const payload = {
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: {
+        temperature: options.temperature !== undefined ? options.temperature : 0.7,
+        maxOutputTokens: options.maxTokens || 8192
+      },
+      safetySettings: [
+        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
+        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
+      ]
+    };
+
+    if (options.isJson) {
+      payload.generationConfig.responseMimeType = 'application/json';
+    }
+
     try {
-      const parsed = JSON.parse(errBody);
-      if (parsed.error && parsed.error.message) {
-        msg = `Gemini API Error: ${parsed.error.message}`;
+      if (i > 0) {
+        console.log(`[Gemini Cascade] Đang tự động chuyển sang model dự phòng: ${currentModel}...`);
       }
-    } catch (e) {}
-    throw new Error(msg);
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const errBody = await res.text();
+        let msg = `Gemini API Error (${res.status}): ${errBody}`;
+        try {
+          const parsed = JSON.parse(errBody);
+          if (parsed.error && parsed.error.message) {
+            msg = `Gemini API Error: ${parsed.error.message}`;
+          }
+        } catch (e) {}
+
+        const isOverloaded = res.status === 503 || res.status === 429 || /high demand|spikes in demand|overloaded|resource_exhausted|temporarily unavailable/i.test(msg);
+        if (isOverloaded && i < modelsToTry.length - 1) {
+          console.warn(`[Gemini Auto-Fallback] Model ${currentModel} đang quá tải tạm thời (${msg}). Tự động thử model tiếp theo...`);
+          await new Promise(r => setTimeout(r, 600));
+          continue;
+        }
+        throw new Error(msg);
+      }
+
+      const data = await res.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) throw new Error('Google Gemini không trả về nội dung (Có thể do bộ lọc an toàn)');
+
+      if (options.isJson) {
+        return cleanAndParseJson(text);
+      }
+      return text;
+    } catch (err) {
+      lastError = err;
+      const isOverloaded = /high demand|spikes in demand|overloaded|resource_exhausted|503|429/i.test(err.message);
+      if (isOverloaded && i < modelsToTry.length - 1) {
+        console.warn(`[Gemini Auto-Fallback] Model ${currentModel} gặp lỗi (${err.message}). Tự động thử model tiếp theo...`);
+        await new Promise(r => setTimeout(r, 600));
+        continue;
+      }
+      throw err;
+    }
   }
 
-  const data = await res.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) throw new Error('Google Gemini không trả về nội dung (Có thể do bộ lọc an toàn)');
-
-  if (options.isJson) {
-    return cleanAndParseJson(text);
-  }
-  return text;
+  throw lastError || new Error('Không thể kết nối tới Google Gemini API');
 }
 
 /**
