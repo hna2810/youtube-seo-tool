@@ -83,42 +83,39 @@
           <!-- COLLAPSIBLE API KEYS SETTINGS -->
           <div class="api-settings-box">
             <div class="api-toggle-header" id="toggle-api-settings">
-              <span>⚙️ Cài đặt OpenRouter API Key & Model AI</span>
+              <span>⚙️ Cài đặt AI API Key (Google Gemini / OpenRouter) & Model</span>
               <span class="toggle-icon">▼</span>
             </div>
             <div class="api-settings-body" id="api-settings-body">
               <div class="form-row">
                 <div class="form-group col-6">
-                  <label for="openrouter-key" class="form-label">OpenRouter API Key (sk-or-v1-...) <span class="required">*</span></label>
-                  <input type="password" id="openrouter-key" class="form-control" placeholder="sk-or-v1-..." />
-                  <small class="text-hint">Lấy key tại <a href="https://openrouter.ai/keys" target="_blank" style="color:var(--primary);text-decoration:underline;">openrouter.ai/keys</a>. Key được lưu an toàn trực tiếp trên trình duyệt của bạn (localStorage), không lưu trên server.</small>
+                  <label for="openrouter-key" class="form-label">Google Gemini API Key (Khuyên dùng) / OpenRouter Key <span class="required">*</span></label>
+                  <input type="password" id="openrouter-key" class="form-control" placeholder="Dán Gemini key (AIza... hoặc AQ...) hoặc OpenRouter (sk-or-v1-...)" />
+                  <small class="text-hint">🔥 Khuyên dùng <b>Google Gemini API Key</b> (hoàn toàn miễn phí, dồi dào token, không lo cạn hạn mức): Lấy key tại <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--primary);font-weight:700;text-decoration:underline;">aistudio.google.com/app/apikey</a>. (Hoặc lấy OpenRouter tại <a href="https://openrouter.ai/keys" target="_blank" style="color:var(--primary);text-decoration:underline;">openrouter.ai/keys</a>). Key lưu an toàn trên trình duyệt.</small>
                 </div>
                 <div class="form-group col-6">
                   <div class="model-label-row">
-                    <label for="openrouter-model" class="form-label" style="margin-bottom: 0;">Model LLM (Tất cả 400+ model OpenRouter) <span class="required">*</span></label>
-                    <span id="model-count-badge" class="model-badge">Đang nạp model...</span>
+                    <label for="openrouter-model" class="form-label" style="margin-bottom: 0;">Model AI <span class="required">*</span></label>
+                    <span id="model-count-badge" class="model-badge">Gemini 2.5 Flash</span>
                   </div>
-                  <input type="text" id="openrouter-model" list="model-datalist" class="form-control" placeholder="Gõ tìm hoặc nhập Model ID bất kỳ..." value="openai/gpt-4o-mini" autocomplete="off" />
+                  <input type="text" id="openrouter-model" list="model-datalist" class="form-control" placeholder="Gõ tìm hoặc nhập Model ID..." value="gemini-2.5-flash" autocomplete="off" />
                   <datalist id="model-datalist">
-                    <option value="openai/gpt-4o-mini">⚡ OpenAI: GPT-4o Mini (Siêu tốc ~2s, Tiết kiệm nhất, 100% tiếng Việt chuẩn)</option>
-                    <option value="deepseek/deepseek-chat">DeepSeek: DeepSeek V3</option>
+                    <option value="gemini-2.5-flash">⚡ Google Gemini 2.5 Flash (Siêu tốc ~2s, Dồi dào Token nhất - Khuyên dùng)</option>
+                    <option value="gemini-2.5-pro">💎 Google Gemini 2.5 Pro (Tư duy sâu sắc, Viết bài chuyên sâu)</option>
+                    <option value="gemini-3.6-flash">🚀 Google Gemini 3.6 Flash (Bản mới nhất)</option>
+                    <option value="openai/gpt-4o-mini">⚡ OpenAI: GPT-4o Mini (OpenRouter - Siêu tốc)</option>
+                    <option value="deepseek/deepseek-chat">DeepSeek: DeepSeek V3 (OpenRouter)</option>
                     <option value="openrouter/free">✨ OpenRouter Auto Free (100% Miễn phí)</option>
-                    <option value="google/gemini-2.5-flash">Google: Gemini 2.5 Flash</option>
                     <option value="anthropic/claude-sonnet-4.5">Anthropic: Claude Sonnet 4.5</option>
-                    <option value="openai/gpt-4o">OpenAI: GPT-4o</option>
-                    <option value="deepseek/deepseek-r1">DeepSeek: DeepSeek R1</option>
-                    <option value="meta-llama/llama-3.3-70b-instruct">Meta: Llama 3.3 70B</option>
-                    <option value="qwen/qwen-2.5-72b-instruct">Qwen: Qwen 2.5 72B</option>
                   </datalist>
                   <div class="model-quick-tags" id="model-quick-tags">
                     <span class="quick-tags-title">Gợi ý nhanh:</span>
-                    <button type="button" class="btn-model-tag active" data-model="openai/gpt-4o-mini" style="background:#e8f0fe;border-color:#1a73e8;color:#1a73e8;font-weight:700;">⚡ GPT-4o Mini (Siêu tốc ~2s - Khuyên dùng)</button>
-                    <button type="button" class="btn-model-tag" data-model="deepseek/deepseek-chat">DeepSeek V3</button>
+                    <button type="button" class="btn-model-tag active" data-model="gemini-2.5-flash" style="background:#e8f0fe;border-color:#1a73e8;color:#1a73e8;font-weight:700;">⚡ Gemini 2.5 Flash (Dồi dào Token)</button>
+                    <button type="button" class="btn-model-tag" data-model="gemini-2.5-pro" style="background:#f3e8fd;border-color:#9333ea;color:#7e22ce;font-weight:700;">💎 Gemini 2.5 Pro</button>
+                    <button type="button" class="btn-model-tag" data-model="openai/gpt-4o-mini">⚡ GPT-4o Mini</button>
                     <button type="button" class="btn-model-tag" data-model="openrouter/free" style="background:#e6f4ea;border-color:#137333;color:#137333;font-weight:700;">✨ Auto Free</button>
-                    <button type="button" class="btn-model-tag" data-model="google/gemini-2.5-flash">Gemini 2.5</button>
-                    <button type="button" class="btn-model-tag" data-model="anthropic/claude-sonnet-4.5">Claude Sonnet 4.5</button>
                   </div>
-                  <small class="text-hint">Hỗ trợ tất cả 400+ model OpenRouter. Khuyên dùng <b>GPT-4o Mini</b> (tạo bài siêu nhanh ~2s, không lỗi chữ Hán) hoặc <b>Auto Free</b> (miễn phí).</small>
+                  <small class="text-hint">Hỗ trợ đầy đủ Google Gemini Direct và 400+ model OpenRouter. Hệ thống tự động nhận diện theo API Key bạn nhập.</small>
                 </div>
               </div>
             </div>
@@ -585,13 +582,11 @@
           <input type="text" id="modal-retry-model" list="model-datalist" class="form-control" placeholder="Gõ tìm hoặc chọn model từ danh sách..." autocomplete="off" />
           <div class="model-quick-tags mt-2" id="modal-retry-quick-tags">
             <span class="quick-tags-title">Gợi ý nhanh:</span>
-            <button type="button" class="btn-model-tag" data-model="openai/gpt-4o-mini" style="background:#e8f0fe;border-color:#1a73e8;color:#1a73e8;font-weight:700;">⚡ GPT-4o Mini (Siêu tốc ~2s)</button>
+            <button type="button" class="btn-model-tag active" data-model="gemini-2.5-flash" style="background:#e8f0fe;border-color:#1a73e8;color:#1a73e8;font-weight:700;">⚡ Gemini 2.5 Flash (Dồi dào Token)</button>
+            <button type="button" class="btn-model-tag" data-model="gemini-2.5-pro" style="background:#f3e8fd;border-color:#9333ea;color:#7e22ce;font-weight:700;">💎 Gemini 2.5 Pro</button>
+            <button type="button" class="btn-model-tag" data-model="openai/gpt-4o-mini">⚡ GPT-4o Mini</button>
             <button type="button" class="btn-model-tag" data-model="deepseek/deepseek-chat">DeepSeek V3</button>
             <button type="button" class="btn-model-tag" data-model="openrouter/free" style="background:#e6f4ea;border-color:#137333;color:#137333;font-weight:700;">✨ Auto Free (Miễn phí)</button>
-            <button type="button" class="btn-model-tag" data-model="google/gemini-2.5-flash">Gemini 2.5 Flash</button>
-            <button type="button" class="btn-model-tag" data-model="deepseek/deepseek-r1">DeepSeek R1</button>
-            <button type="button" class="btn-model-tag" data-model="meta-llama/llama-3.3-70b-instruct">Llama 3.3</button>
-            <button type="button" class="btn-model-tag" data-model="anthropic/claude-sonnet-4.5">Claude Sonnet 4.5</button>
           </div>
         </div>
       </div>

@@ -65,15 +65,16 @@ function getDefaultApiKey() {
 function getApiKeyStatus(customKey = null) {
   if (customKey && customKey.trim()) {
     const key = customKey.trim();
+    const provider = detectProvider(key);
     const masked = key.length > 8 
       ? `${key.substring(0, 7)}...${key.substring(key.length - 4)}` 
       : '****';
     return {
       hasKey: true,
       maskedKey: masked,
-      provider: detectProvider(key),
+      provider: provider,
       source: 'user_provided',
-      configuredModel: 'openai/gpt-4o-mini'
+      configuredModel: provider === 'gemini' ? 'gemini-2.5-flash' : 'openai/gpt-4o-mini'
     };
   }
 
@@ -82,15 +83,17 @@ function getApiKeyStatus(customKey = null) {
     maskedKey: null,
     provider: 'none',
     source: 'none',
-    configuredModel: 'openai/gpt-4o-mini'
+    configuredModel: 'gemini-2.5-flash'
   };
 }
 
 function detectProvider(key) {
   if (!key) return 'none';
-  if (key.startsWith('sk-or-')) return 'openrouter';
-  if (key.startsWith('AIza') || key.startsWith('AQ.')) return 'gemini';
-  return 'openrouter'; // Mặc định coi là OpenRouter
+  const trimmed = key.trim();
+  if (trimmed.startsWith('sk-or-')) return 'openrouter';
+  if (trimmed.startsWith('AIza') || trimmed.startsWith('AQ.') || trimmed.startsWith('AQ')) return 'gemini';
+  // Mặc định coi là Google Gemini nếu không có tiền tố OpenRouter
+  return 'gemini';
 }
 
 /**
@@ -403,6 +406,15 @@ let cachedModels = null;
 let lastFetchTime = 0;
 
 async function getAvailableOpenRouterModels(apiKey = null) {
+  if (apiKey && detectProvider(apiKey) === 'gemini') {
+    return [
+      { id: 'gemini-2.5-flash', name: '⚡ Google: Gemini 2.5 Flash (Dồi dào Token nhất - Khuyên dùng)', isPopular: true, isFree: true },
+      { id: 'gemini-2.5-pro', name: '💎 Google: Gemini 2.5 Pro (Tư duy sâu sắc & Viết chuyên sâu)', isPopular: true },
+      { id: 'gemini-3.6-flash', name: '🚀 Google: Gemini 3.6 Flash (Thế hệ mới)', isPopular: true },
+      { id: 'gemini-flash-latest', name: 'Google: Gemini Flash Latest', isPopular: false }
+    ];
+  }
+
   const now = Date.now();
   if (cachedModels && (now - lastFetchTime < 3600000)) {
     return cachedModels;
@@ -602,7 +614,11 @@ async function callOpenRouter(apiKey, prompt, options = {}) {
  * Gọi Gemini Trực Tiếp (Fallback nếu key là Google Gemini)
  */
 async function callGeminiDirect(apiKey, prompt, options = {}) {
-  const model = options.model || 'gemini-2.5-flash';
+  let model = options.model || 'gemini-2.5-flash';
+  // Chuẩn hóa tên model sang Google Gemini nếu truyền nhầm model OpenRouter
+  if (model.includes('/') || !model.startsWith('gemini')) {
+    model = 'gemini-2.5-flash';
+  }
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   const payload = {
@@ -610,7 +626,13 @@ async function callGeminiDirect(apiKey, prompt, options = {}) {
     generationConfig: {
       temperature: options.temperature !== undefined ? options.temperature : 0.7,
       maxOutputTokens: options.maxTokens || 8192
-    }
+    },
+    safetySettings: [
+      { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
+    ]
   };
 
   if (options.isJson) {
@@ -625,12 +647,19 @@ async function callGeminiDirect(apiKey, prompt, options = {}) {
 
   if (!res.ok) {
     const errBody = await res.text();
-    throw new Error(`Gemini API Error (${res.status}): ${errBody}`);
+    let msg = `Gemini API Error (${res.status}): ${errBody}`;
+    try {
+      const parsed = JSON.parse(errBody);
+      if (parsed.error && parsed.error.message) {
+        msg = `Gemini API Error: ${parsed.error.message}`;
+      }
+    } catch (e) {}
+    throw new Error(msg);
   }
 
   const data = await res.json();
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) throw new Error('AI không trả về nội dung');
+  if (!text) throw new Error('Google Gemini không trả về nội dung (Có thể do bộ lọc an toàn)');
 
   if (options.isJson) {
     return cleanAndParseJson(text);
@@ -654,13 +683,17 @@ async function callGemini(prompt, options = {}) {
   }
 
   if (!activeKey) {
-    throw new Error('Vui lòng nhập OpenRouter API Key (sk-or-v1-...) của bạn trên giao diện để sử dụng! (Hệ thống yêu cầu mỗi người dùng sử dụng API Key riêng của mình).');
+    throw new Error('Vui lòng nhập API Key (Google Gemini hoặc OpenRouter) của bạn trên giao diện để sử dụng! (Hệ thống yêu cầu mỗi người dùng sử dụng API Key riêng của mình).');
   }
 
   console.log(`[LLM Caller] Đang gọi qua Provider: ${provider.toUpperCase()} (Model: ${options.model || 'default'})`);
 
   if (provider === 'gemini') {
-    return await callGeminiDirect(activeKey, prompt, options);
+    let geminiModel = options.model;
+    if (!geminiModel || geminiModel.includes('/') || !geminiModel.startsWith('gemini')) {
+      geminiModel = 'gemini-2.5-flash';
+    }
+    return await callGeminiDirect(activeKey, prompt, { ...options, model: geminiModel });
   } else {
     return await callOpenRouter(activeKey, prompt, options);
   }

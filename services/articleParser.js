@@ -107,7 +107,7 @@ function sanitizeChineseCharacters(text) {
 /**
  * Phân tích phản hồi từ LLM Agent 4 (Hỗ trợ cả định dạng Tag Delimiter và JSON)
  */
-function parseArticleResponse(rawResponse, defaultKeyword = '') {
+function parseArticleResponse(rawResponse, defaultKeyword = '', extraContext = {}) {
   if (!rawResponse || typeof rawResponse !== 'string') {
     throw new Error('Nội dung phản hồi từ AI rỗng');
   }

@@ -4,8 +4,8 @@
 
 // Application State
 const state = {
-  apiKey: localStorage.getItem('openrouter_api_key') || localStorage.getItem('gemini_api_key') || '',
-  model: localStorage.getItem('openrouter_model') || 'openai/gpt-4o-mini',
+  apiKey: localStorage.getItem('gemini_api_key') || localStorage.getItem('openrouter_api_key') || '',
+  model: localStorage.getItem('openrouter_model') || 'gemini-2.5-flash',
   ytApiKey: localStorage.getItem('yt_api_key') || '',
   wpUrl: localStorage.getItem('wp_site_url') || '',
   wpApiKey: localStorage.getItem('wp_api_key') || '',
@@ -151,6 +151,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   restoreSessionProgress();
 });
 
+function detectProviderFrontend(key) {
+  if (!key) return '';
+  const trimmed = key.trim();
+  if (trimmed.startsWith('sk-or-')) return 'OpenRouter';
+  return 'Gemini';
+}
+
 // 1. Cài đặt API Keys & WP Settings ban đầu
 function initSavedSettings() {
   if (state.apiKey) {
@@ -162,13 +169,19 @@ function initSavedSettings() {
     }
   }
 
+  const keyProv = detectProviderFrontend(state.apiKey);
   const savedModel = localStorage.getItem('openrouter_model');
-  if (!savedModel || savedModel === 'google/gemini-2.5-flash' || savedModel === 'deepseek/deepseek-chat') {
-    state.model = 'openai/gpt-4o-mini';
+  if (!savedModel) {
+    state.model = (keyProv === 'OpenRouter') ? 'openai/gpt-4o-mini' : 'gemini-2.5-flash';
+    localStorage.setItem('openrouter_model', state.model);
+  } else if (keyProv === 'Gemini' && (savedModel.includes('/') || !savedModel.startsWith('gemini'))) {
+    // Nếu key là Gemini nhưng model trước đó là OpenRouter, chuyển sang Gemini 2.5 Flash
+    state.model = 'gemini-2.5-flash';
     localStorage.setItem('openrouter_model', state.model);
   } else {
     state.model = savedModel;
   }
+
   if (state.model) {
     el.openrouterModel.value = state.model;
     highlightActiveModelTag(state.model);
@@ -179,6 +192,21 @@ function initSavedSettings() {
   const handleKeyUpdate = () => {
     state.apiKey = el.openrouterKey.value.trim();
     localStorage.setItem('openrouter_api_key', state.apiKey);
+    localStorage.setItem('gemini_api_key', state.apiKey);
+
+    const prov = detectProviderFrontend(state.apiKey);
+    if (prov === 'Gemini' && (state.model.includes('/') || !state.model.startsWith('gemini'))) {
+      state.model = 'gemini-2.5-flash';
+      localStorage.setItem('openrouter_model', state.model);
+      if (el.openrouterModel) el.openrouterModel.value = state.model;
+      highlightActiveModelTag(state.model);
+    } else if (prov === 'OpenRouter' && !state.model.includes('/')) {
+      state.model = 'openai/gpt-4o-mini';
+      localStorage.setItem('openrouter_model', state.model);
+      if (el.openrouterModel) el.openrouterModel.value = state.model;
+      highlightActiveModelTag(state.model);
+    }
+
     updateApiStatusBadgeModel();
   };
 
@@ -241,17 +269,18 @@ function highlightActiveModelTag(modelId) {
 }
 
 function updateApiStatusBadgeModel() {
-  const shortName = (state.model || '').split('/')[1] || state.model || 'OpenRouter';
+  const shortName = (state.model || '').split('/')[1] || state.model || 'gemini-2.5-flash';
+  const prov = detectProviderFrontend(state.apiKey) || 'AI';
   if (el.headerModelName) {
     el.headerModelName.textContent = `Model: ${shortName}`;
   }
   if (el.apiStatusBadge) {
     if (state.apiKey) {
       el.apiStatusBadge.className = 'badge badge-success';
-      el.apiStatusBadge.textContent = `🟢 Key OK (${shortName})`;
+      el.apiStatusBadge.textContent = `🟢 ${prov} (${shortName})`;
     } else {
       el.apiStatusBadge.className = 'badge badge-warning';
-      el.apiStatusBadge.textContent = '🟡 Cần nhập OpenRouter API Key';
+      el.apiStatusBadge.textContent = '🟡 Cần nhập Gemini / OpenRouter Key';
     }
   }
 }
@@ -428,13 +457,14 @@ async function checkServerStatus() {
         el.openrouterModel.value = state.model;
         highlightActiveModelTag(state.model);
       }
-      const shortName = (state.model || '').split('/')[1] || state.model || 'OpenRouter';
+      const shortName = (state.model || '').split('/')[1] || state.model || 'gemini-2.5-flash';
+      const prov = (res.llmStatus.provider === 'openrouter') ? 'OpenRouter' : 'Gemini';
       if (state.apiKey) {
         el.apiStatusBadge.className = 'badge badge-success';
-        el.apiStatusBadge.textContent = `🟢 Key OK (${shortName})`;
+        el.apiStatusBadge.textContent = `🟢 ${prov} (${shortName})`;
       } else {
         el.apiStatusBadge.className = 'badge badge-warning';
-        el.apiStatusBadge.textContent = '🟡 Cần nhập OpenRouter API Key';
+        el.apiStatusBadge.textContent = '🟡 Cần nhập Gemini / OpenRouter Key';
       }
     }
   } catch (err) {
@@ -817,7 +847,7 @@ async function handleAnalyzeAndSuggestKeywords() {
 
   state.apiKey = el.openrouterKey.value.trim();
   if (!state.apiKey) {
-    alert('Vui lòng nhập OpenRouter API Key (sk-or-v1-...) trong mục "⚙️ Cài đặt OpenRouter API Key & Model AI" bên trên để bắt đầu phân tích AI!');
+    alert('Vui lòng nhập Google Gemini API Key (Khuyên dùng) hoặc OpenRouter API Key trong mục "⚙️ Cài đặt AI API Key" bên trên để bắt đầu phân tích AI!');
     if (el.apiSettingsBody) el.apiSettingsBody.classList.add('show');
     if (el.openrouterKey) el.openrouterKey.focus();
     return;
@@ -978,7 +1008,7 @@ function normalizeOutlineList(rawOutline) {
 async function handleCreateOutline() {
   state.apiKey = el.openrouterKey.value.trim();
   if (!state.apiKey) {
-    alert('Vui lòng nhập OpenRouter API Key (sk-or-v1-...) trong mục Cài đặt để tạo Dàn ý bằng AI!');
+    alert('Vui lòng nhập Google Gemini API Key hoặc OpenRouter API Key trong mục Cài đặt để tạo Dàn ý bằng AI!');
     if (el.apiSettingsBody) el.apiSettingsBody.classList.add('show');
     if (el.openrouterKey) el.openrouterKey.focus();
     return;
@@ -1432,7 +1462,7 @@ async function handleWriteArticle() {
 
   state.apiKey = el.openrouterKey.value.trim();
   if (!state.apiKey) {
-    alert('Vui lòng nhập OpenRouter API Key (sk-or-v1-...) trong mục Cài đặt để AI viết bài hoàn chỉnh!');
+    alert('Vui lòng nhập Google Gemini API Key hoặc OpenRouter API Key trong mục Cài đặt để AI viết bài hoàn chỉnh!');
     if (el.apiSettingsBody) el.apiSettingsBody.classList.add('show');
     if (el.openrouterKey) el.openrouterKey.focus();
     return;

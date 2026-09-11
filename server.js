@@ -86,7 +86,7 @@ app.post('/api/analyze-content', async (req, res) => {
   try {
     const { metadata, transcript, apiKey, model } = req.body;
     if (!apiKey || !apiKey.trim()) {
-      return res.status(400).json({ success: false, error: 'Vui lòng nhập OpenRouter API Key (sk-or-v1-...) trên giao diện để tiếp tục!' });
+      return res.status(400).json({ success: false, error: 'Vui lòng nhập API Key (Google Gemini hoặc OpenRouter) trên giao diện để tiếp tục!' });
     }
     if (!metadata || !transcript) {
       return res.status(400).json({ success: false, error: 'Thiếu thông tin metadata hoặc transcript' });
@@ -108,7 +108,7 @@ app.post('/api/suggest-keywords', async (req, res) => {
   try {
     const { contentAnalysis, metadata, apiKey, model } = req.body;
     if (!apiKey || !apiKey.trim()) {
-      return res.status(400).json({ success: false, error: 'Vui lòng nhập OpenRouter API Key (sk-or-v1-...) trên giao diện để tiếp tục!' });
+      return res.status(400).json({ success: false, error: 'Vui lòng nhập API Key (Google Gemini hoặc OpenRouter) trên giao diện để tiếp tục!' });
     }
     if (!contentAnalysis) {
       return res.status(400).json({ success: false, error: 'Thiếu dữ liệu phân tích nội dung' });
@@ -130,7 +130,7 @@ app.post('/api/generate-outline', async (req, res) => {
   try {
     const { selectedKeyword, contentAnalysis, lsiKeywords, options, apiKey, model } = req.body;
     if (!apiKey || !apiKey.trim()) {
-      return res.status(400).json({ success: false, error: 'Vui lòng nhập OpenRouter API Key (sk-or-v1-...) trên giao diện để tiếp tục!' });
+      return res.status(400).json({ success: false, error: 'Vui lòng nhập API Key (Google Gemini hoặc OpenRouter) trên giao diện để tiếp tục!' });
     }
     if (!selectedKeyword || !contentAnalysis) {
       return res.status(400).json({ success: false, error: 'Thiếu từ khóa chính hoặc dữ liệu phân tích' });
@@ -176,7 +176,7 @@ app.post('/api/write-article', async (req, res) => {
   try {
     const { approvedOutline, selectedKeyword, youtubeData, contentAnalysis, internalLinks, options, apiKey, model } = req.body;
     if (!apiKey || !apiKey.trim()) {
-      return res.status(400).json({ success: false, error: 'Vui lòng nhập OpenRouter API Key (sk-or-v1-...) trên giao diện để tiếp tục!' });
+      return res.status(400).json({ success: false, error: 'Vui lòng nhập API Key (Google Gemini hoặc OpenRouter) trên giao diện để tiếp tục!' });
     }
     if (!approvedOutline || !selectedKeyword || !youtubeData) {
       return res.status(400).json({ success: false, error: 'Thiếu thông tin dàn ý hoặc dữ liệu video' });
